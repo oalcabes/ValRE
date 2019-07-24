@@ -1,0 +1,32 @@
+
+ValRE EDITS
+
+what my code does:
+-reads in model files **may be worth it to change this to only extract chosen dates and not read in all
+-extracts files from chosen dates
+-extracts values from model output for each date
+-checks if there's observational output for each model date, and if there isn't uses katie's code to create it
+-extracts values from observational output for each model output that exists
+-compares all clear stuff to each other to generate metrics
+-uses other values to create verification graphs
+-prints everything to reports
+
+THIS DOCUMENT HAS NOTES FOR ANYONE WHO MAY HAVE TO ALTER THE ValRE CODE. READ BELOW IF ValRE
+IS NOT WORKING CORRECTLY AND YOU NEED TO EDIT IT.
+
+ValRE Assumptions
+=================
+- all output files have some string of the date in them in the forms: YYYY-MM-DD or YYYY_MM_DD
+-
+
+
+
+
+
+***RIGHT NOW: IF AN ONGOING EVENT IS HAPPENING VALIDATION READS IT AS A YES
+***HERES WHAT THE PROBLEM WITH THAT WOULD BE: IF AN OBSERVED EVENT STARTS BEFORE MIDNIGHT BUT THE MODEL
+DOESN'T PICK IT UP UNTIL AFTER MIDNIGHT AND ALL THE FILES ARE SPLIT BY DAYS, THAT WOULD READ AS
+ONE MISS AND ONE HIT INSTEAD OF JUST ONE LATE HIT. IF YOU KNOW ABOUT SUCH AN EVENT IN ADVANCE, I WOULD SUGGEST
+MERGING THE FILES OF BOTH DAYS SO THAT THAT DOESN'T HAPPEN.
+
+**WHAT HAPPENS IF AN INSTRUMENT CHANGES IN THE MIDDLE OF AN EVENT????
