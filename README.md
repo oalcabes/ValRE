@@ -104,8 +104,8 @@ of your model files, ValRE will NOT be able to function!
 
 ---
 DETECT PREVIOUS EVENT
-write doc here ******* / possibly add this into code and just document it in the editing
-documentation file
+This normally should be False. You may need to change the value to True if you are validating multiple events that happened extremely 
+close to each other and you do not already have observational output for them. This may change in later additions of the code.
 
 ---
 THRESHOLDS
