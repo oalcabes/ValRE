@@ -58,6 +58,7 @@ In the configuration document, specify:
 6. detect previous event value ** explained in detail below, please read before changing from False
 7. thresholds for the energy, the flux, and/or the probability
 8. whether or not you'd like PDF and JSON reports
+9. manual inputs for hits, misses, correct negatives, and false alarms
 
 The formats in which all of these values must be given in are detailed in the comments of the
 configuration file, as well as in the "input formats" section below.
@@ -126,6 +127,16 @@ REPORTS
 FORMAT: True or False boolean
 OTHER NOTES: this is not either/or, both can be marked True if you'd like both reports
 and both can be marked False if you'd like none.
+
+---
+MANUAL ADDITIONS
+FORMAT: lists of integers
+EX. [0,5]
+OTHER NOTES: All of these value should be 0 if you have not completed any calculations yourself. Lists must be the same length as 
+energy_threshold determined in the thresholds category above, and each value is the amount of manual hits, misses, correct negatives, or 
+false alarms for the corresponding energy_threshold that has been calculated manually. These values can be added to if there are 
+particular events that ValRE is not able to use model and/or observational output to calculate, but you would still like to be included 
+for calculations of metric scores.
 
 More extensive documentation
 ============================
