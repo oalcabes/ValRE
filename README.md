@@ -70,6 +70,7 @@ validation_reports/figures directory.
 Input Formats
 =============
 PATHFILES
+---
 FORMAT: output directories in the form of a string
 EX. '.\Mag4_output'
 OTHER NOTES: Write the directory however you would on your own computer.
@@ -77,14 +78,14 @@ The current working directory is the directory you have placed the ValRE package
 If you do not have dates specified in the names
 of your model files, ValRE will NOT be able to function
 
----
 MODEL NAME
+---
 FORMAT: string
 EX. 'MAG4'
 OTHER NOTES: this will only be used for report-writing purposes
 
----
 INSTRUMENT FOR OBSERVATIONS
+---
 FORMAT: string
 EX: 'GOES-08'
 OPTIONS: GOES-08, -10, -11, -12, -13, -14 -15, SEPEM
@@ -94,8 +95,8 @@ you'd like to use for the entire validation, or if you are using instrumental da
 you've created yourself, comment-in the line below:
 instrument = 'GOES-15''
 
----
 START AND END DATES
+---
 FORMAT: integers
 EX: 2010, 5, 1
 OTHER NOTES: you do not actually have to have model output for your beginning and
@@ -103,13 +104,13 @@ end dates. ValRE will simply extract all model files that are dated within the d
 range that you have specified. If you do not have dates specified in the names
 of your model files, ValRE will NOT be able to function!
 
----
 DETECT PREVIOUS EVENT
+---
 This normally should be False. You may need to change the value to True if you are validating multiple events that happened extremely 
 close to each other and you do not already have observational output for them. This may change in later additions of the code.
 
----
 THRESHOLDS
+---
 FORMAT: lists of integers or floats
 EX: [10,100]
 OTHER NOTES: indices of threshold lists must correspond to each other. Ie, if the first
@@ -122,14 +123,14 @@ thresholds and will read them in instead.
 Finally, ValRE will check if a model does not have output for each threshold and
 if it doesn't simply won't create a report for that threshold.
 
+REPORTS
 ---
-REPORTS 
 FORMAT: True or False boolean
 OTHER NOTES: this is not either/or, both can be marked True if you'd like both reports
 and both can be marked False if you'd like none.
 
----
 MANUAL ADDITIONS
+---
 FORMAT: lists of integers
 EX. [0,5]
 OTHER NOTES: All of these value should be 0 if you have not completed any calculations yourself. Lists must be the same length as 
