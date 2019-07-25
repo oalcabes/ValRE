@@ -50,11 +50,18 @@ correctly, and you can't just change your output files.
                if str(mod_start_time.date()) in str(obs_f) or mod_start_time.strftime('%Y_%m_%d') in str(obs_f):
      and again, you can just add another or statement in both if statements with"
           mod_start_time.strftime(your format) in str(obs_f)
-
-   
+2. DETECT PREVIOUS EVENT VALUE: This is an input value for the operational_sep_quantities.py module. For most ValRE purposes, the detect
+previous event value can be set to false, as most events that ValRE uses do not occur right after each other. However, for such an
+event, if it is necessary to go into the GOES database to retrieve observational data, it may be necessary to change the detect previous
+event value to True. ValRE does not currently have a way to automate this, and it may be necessary to validate that particular event
+manually. If you need to add in an automation, you can edit the function database_extraction and change the input in the function
+sep.run_all from cfg.detect_previous_event to your own value.
+3. UPDATES TO operational_sep_quantities.py:
    
    
  some ideas for new things I could do with ValRE
  ===============================================
  - do some calculations w peak intensity differences
  - make it possible to add to a previous validation report by adding all the hits and misses from a previous report to a new one
+ - add in way to manually add to hits/misses/etc.
+ - add a skip dates option
