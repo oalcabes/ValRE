@@ -63,5 +63,4 @@ sep.run_all from cfg.detect_previous_event to your own value.
  ===============================================
  - do some calculations w peak intensity differences
  - make it possible to add to a previous validation report by adding all the hits and misses from a previous report to a new one
- - add in way to manually add to hits/misses/etc.
  - add a skip dates option
