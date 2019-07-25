@@ -1,11 +1,5 @@
 # ValRE
 
-Readme file for ValRE radiation event validation software written in Python 3.
-
-NOTE: IF YOU NEED TO ALTER THE CODE, PLEASE READ ValRE_ADDITIONS.TXT
-
-Purpose
-========
 ValRE validates spaceweather forecasting models of SEP events. Validation is done by
 comparing model forecasts of events to historical observations and generating skill scores,
 which are written into reports (in PDF and/or JSON format). ValRE also creates plots
@@ -15,6 +9,8 @@ validation_reports/figures folder.
 ***NOTE: ValRE was not intended for the creation of model output. Model output must already
 be present before running ValRE; however, given model output, ValRE has the capability of
 generating the necessary observational output from the iswa GOES database.
+
+NOTE: IF YOU NEED TO ALTER THE CODE, PLEASE READ ValRE_ADDITIONS.TXT
 
 Included With the ValRE Package:
 ================================
