@@ -56,9 +56,18 @@ event, if it is necessary to go into the GOES database to retrieve observational
 event value to True. ValRE does not currently have a way to automate this, and it may be necessary to validate that particular event
 manually. If you need to add in an automation, you can edit the function database_extraction and change the input in the function
 sep.run_all from cfg.detect_previous_event to your own value.
-3. UPDATES TO operational_sep_quantities.py:
-   
-   
+3. UPDATES TO operational_sep_quantities.py: If there is a new version of operational_sep_quantities.py, you can replace the old copy of
+the file in the ValRE folder with the new copy. However, if the inputs or outputs to the function have changed, it may be necessary to
+alter the way ValRE incorporates the code accordingly.
+    a. CHANGES TO INPUT: Most alterations to the input can be made in the database_extraction function in the ValRE.py code, before the
+    sep.run_all command is run.
+    b. CHANGES TO OUTPUT: The current output files of operational_sep_quantities.py (as of July 2019) are csv documents with various 
+    important values. The function (located in the ValRE folder) output_to_json.py includes a function called obs_csv2json, which loads 
+    in all of the values from the csv files and reformats them into the JSON format given by the CCMC. If the output of 
+    operational_sep_quantities.py changes or has problems, these observational JSON files may be created incorrectly. Therefore, it may 
+    be necessary to edit the obs_csv2json function directly to make sure all of the values are correctly loaded into JSON.
+  
+  
  some ideas for new things I could do with ValRE
  ===============================================
  - do some calculations w peak intensity differences
