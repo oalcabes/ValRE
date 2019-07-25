@@ -20,22 +20,41 @@ what my code does:
 ValRE Assumptions
 =================
 - all output files have some string of the date in them in the forms: YYYY-MM-DD or YYYY_MM_DD
--
+- all output files are in the JSON form created by the CCMC (this example format can be found in
+  ref_files/example_sepscoreboard_json_file_v20190228.json - however, please do not move/alter this file from its current directory as     ValRE may need to read it in. If you need to use it please just copy it)
+- if an observed event starts before midnight but the model doesn't pick it up until after midnight, ValRE will interpret
+  such an event as one miss and one hit as opposed to one late hit. If you know about such an event, I suggest merging the two files
+  into one, which should fix the problem
+- ValRE currently has no capability for an event in which the primary GOES instrument changes mid-event. It may crash or read
+  the observed data incorrectly (although it's possible the code would still run fine, but check it). In order to account for such an   
+  event, it may make sense to manually input the backup instrument.
 
 Likely Edits
 ============
-1. NOT LOADING IN FILES CORRECTLY: There are a few things you may need to change in the code if it isn't loading in your files correctly.
+1. NOT LOADING IN FILES CORRECTLY: There are a few things you may need to change in the code if it isn't loading in your files 
+correctly, and you can't just change your output files.
    a. INPUT FILES: to load in your input files, you may need to change the format of the datestring that is in the file name. If
-   it is necessary to change this in the actual code as opposed to just changing your files, you can look at line # **SOMETHING
+   it is necessary to change this in the actual code as opposed to just changing your files, you can edit the date_range function
+   lines:
+        d2_str1 = str(d2)
+        d2_str2 = d2.strftime('%Y_%m_%d')
+        # print(d2)
+        for f in all_files:
+            if d2_str1 in str(f) or d2_str2 in str(f):
+    If you need to add a new date format, simply create d2_str3 = d2.strftime('your new format'), and append the line
+    if d2_str1 in str(f) or d2_str2 in str(f): --> if d2_str1 in str(f) or d2_str2 in str(f) or d3_str3 in str(f):
+    b. OUTPUT FILES: Similarly to input files, if you're having problems loading your output files and need to change the form of the
+    datestring, you can alter the following lines in the main function of the code:    
+        if str(mod_start_time.date()) in str(obs_files) or mod_start_time.strftime('%Y_%m_%d') in str(obs_files):
+           for obs_f in obs_files:
+               if str(mod_start_time.date()) in str(obs_f) or mod_start_time.strftime('%Y_%m_%d') in str(obs_f):
+     and again, you can just add another or statement in both if statements with"
+          mod_start_time.strftime(your format) in str(obs_f)
+
    
-
-
-
-
-***RIGHT NOW: IF AN ONGOING EVENT IS HAPPENING VALIDATION READS IT AS A YES
-***HERES WHAT THE PROBLEM WITH THAT WOULD BE: IF AN OBSERVED EVENT STARTS BEFORE MIDNIGHT BUT THE MODEL
-DOESN'T PICK IT UP UNTIL AFTER MIDNIGHT AND ALL THE FILES ARE SPLIT BY DAYS, THAT WOULD READ AS
-ONE MISS AND ONE HIT INSTEAD OF JUST ONE LATE HIT. IF YOU KNOW ABOUT SUCH AN EVENT IN ADVANCE, I WOULD SUGGEST
-MERGING THE FILES OF BOTH DAYS SO THAT THAT DOESN'T HAPPEN.
-
-**WHAT HAPPENS IF AN INSTRUMENT CHANGES IN THE MIDDLE OF AN EVENT????
+   
+   
+ some ideas for new things I could do with ValRE
+ ===============================================
+ - do some calculations w peak intensity differences
+ - make it possible to add to a previous validation report by adding all the hits and misses from a previous report to a new one
