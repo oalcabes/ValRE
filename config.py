@@ -59,9 +59,11 @@ end_month = 6
 end_day = 2
 
 
-### :) ###
-#write doc here ******* / possibly add this into code and just document it in the editing
-#documentation file
+### DO NOT ALTER THIS UNLESS IF YOU HAVE READ DOCUMENTATION ###
+# should be False
+# you may need to alter this file if you are validating multiple events that happened
+# extremely close to each other
+#more info in the ValRE README document
 detect_previous_event = False
 
 
@@ -96,3 +98,24 @@ PDF_report = True
 
 #would you like a version of the report in JSON form? True if yes, False if no
 JSON_report = True
+
+### MANUAL ADDITIONS ###
+#LEAVE THIS UNALTERED IF YOU HAVE NOT COMPLETED ANY CALCULATIONS YOURSELF
+#FORMAT: lists of integers
+#EX. [0,5]
+#OTHER NOTES: lists must be the same length as energy_threshold determined
+#in the thresholds category above, and each value is the amount of manual hits,
+#misses, correct negatives, or false alarms for the corresponding energy_threshold
+#that has been calculated manually. These values can be added to if there
+#are particular events that ValRE is not able to use model and/or observational
+#output to calculate, but you would still like to be included for calculations
+#of metric scores.
+
+#hits calculated manually
+man_hits = [5,8]
+#misses calculated manually
+man_misses = [0,6]
+#correct negatives calculated manually
+man_correct_negatives =[3,9]
+#false alarms calculated manually
+man_false_alarms = [1,1]

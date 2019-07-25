@@ -824,13 +824,13 @@ model_type = 'probabilistic_discrete'
 for j in range(num_thresholds):
 
 #hits
-    h = hits[j]
+    h = hits[j] + cfg.man_hits[j]
 #false alarms
-    fa = false_alarms[j]
+    fa = false_alarms[j] + cfg.man_false_alarms[j]
 #misses
-    m = misses[j]
+    m = misses[j] + cfg.man_misses[j]
 #correct negatives
-    cn = correct_negatives[j]
+    cn = correct_negatives[j] + cfg.man_correct_negatives[j]
 #total
     t = h + fa + m + cn
 
@@ -911,29 +911,29 @@ for j in range(num_thresholds):
 
         if cfg.PDF_report:
 
-            metrics_array = (['METRIC SCORES','','',''],
-                             ['Percent Correct',PC, 'Bias', bias],
-                             ['Hit Rate', H,'False Alarm Rate',F,],
-                             ['Frequency of Misses', FOM,
-                              'Probability of Correct Negatives',POCN],
-                              ['False Alarm Ratio', FAR,'Detection Failure Ratio',DFR],
-                              ['Frequency of Correct Negatives', FOCN,
-                               'Threat Score', TS],
-                              ['Odds Ratio', OR, 'True Skill Score', TSS],
-                              ['Heidke Skill Score',HSS,
-                               'Odds Ratio Skill Score', ORSS],
-                              ['Relative Operating Characteristic Skill Score',RSS])
+            metrics_array = (['METRIC SCORES',''],
+                             ['Percent Correct',PC], ['Bias', bias],
+                             ['Hit Rate', H], ['False Alarm Rate',F,],
+                             ['Frequency of Misses', FOM],
+                             ['Probability of Correct Negatives',POCN],
+                             ['False Alarm Ratio', FAR], ['Detection Failure Ratio',DFR],
+                             ['Frequency of Correct Negatives', FOCN],
+                             ['Threat Score', TS],
+                             ['Odds Ratio', OR], ['True Skill Score', TSS],
+                             ['Heidke Skill Score',HSS],
+                             ['Odds Ratio Skill Score', ORSS],
+                             ['Relative Operating Characteristic Skill Score',RSS])
 
             metrics_report = Table(metrics_array)
             metrics_report.hAlign = 'LEFT'
             metrics_report.setStyle(TableStyle([('BACKGROUND', (0,0),
-                                                 (3,len(metrics_array)),
+                                                 (1,len(metrics_array)),
                                                  colors.lightgrey),('INNERGRID', (0,0),
-                                                 (3,len(metrics_array)),0.25,
+                                                 (1,len(metrics_array)),0.25,
                                                  colors.black),
-                                                 ('BOX', (0,0), (3,len(metrics_array)),
+                                                 ('BOX', (0,0), (1,len(metrics_array)),
                                                   0.25,colors.black),
-                                                 ('SPAN',(0,0),(3,0))]))
+                                                 ('SPAN',(0,0),(1,0))]))
 
         if cfg.JSON_report:
             metrics_dict = {'Percent Correct' : PC, 'Bias' : bias, 'Hit Rate' : H,
@@ -1124,10 +1124,10 @@ if prob_graph:
 else:
     print('no probability plot created')
 
-print('total hits = %s' %hits)
-print('total correct negatives = %s' %correct_negatives)
-print('total false alarms = %s' %false_alarms)
-print('total misses = %s' %misses)
+print('total hits = %s' %(hits+cfg.man_hits))
+print('total correct negatives = %s' %(correct_negatives+cfg.man_correct_negatives))
+print('total false alarms = %s' %(false_alarms + cfg.man_false_alarms))
+print('total misses = %s' %(misses+cfg.man_misses))
 
 #%%
 
