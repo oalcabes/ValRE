@@ -14,20 +14,20 @@ NOTE: IF YOU NEED TO ALTER THE CODE, PLEASE READ ValRE_ADDITIONS.TXT
 
 Included With the ValRE Package:
 ================================
-ValRE_README.txt
-ValRE_ADDITIONS.txt
-ValRE.py
-config.py
-operational_sep_quantities.py
-output_to_json.py
-validation_reports (inner directory - may not be present until first run)
-validation_reports/figures (inner directory that will house PNG files)
-GOES_primary_assignments.csv
-instrument_dates.csv
+ValRE_README.txt  
+ValRE_ADDITIONS.txt  
+ValRE.py  
+config.py  
+operational_sep_quantities.py  
+output_to_json.py  
+validation_reports (inner directory - may not be present until first run)  
+validation_reports/figures (inner directory that will house PNG files)  
+GOES_primary_assignments.csv  
+instrument_dates.csv  
 
 Python Libraries
 ================
-before running ValRE, you must make sure you have the correct Python libraries loaded on your computer.
+Before running ValRE, you must make sure you have the correct Python libraries loaded on your computer.
 Most of these libraries are included in Anaconda Navigator. However, it may be necessary to install some
 yourself. In order to do so, type: "pip install <library>".
 
@@ -71,8 +71,8 @@ Input Formats
 =============
 PATHFILES
 ---
-FORMAT: output directories in the form of a string
-EX. '.\Mag4_output'
+FORMAT: output directories in the form of a string  
+EX. '.\Mag4_output'  
 OTHER NOTES: Write the directory however you would on your own computer.
 The current working directory is the directory you have placed the ValRE package in.
 If you do not have dates specified in the names
@@ -80,25 +80,25 @@ of your model files, ValRE will NOT be able to function
 
 MODEL NAME
 ---
-FORMAT: string
-EX. 'MAG4'
+FORMAT: string  
+EX. 'MAG4'  
 OTHER NOTES: this will only be used for report-writing purposes
 
 INSTRUMENT FOR OBSERVATIONS
 ---
-FORMAT: string
-EX: 'GOES-08'
-OPTIONS: GOES-08, -10, -11, -12, -13, -14 -15, SEPEM
+FORMAT: string  
+EX: 'GOES-08'  
+OPTIONS: GOES-08, -10, -11, -12, -13, -14 -15, SEPEM  
 OTHER NOTES: ValRE automatically chooses the correct GOES observational instrument to
 use for your given start and end dates. However, if you'd like to specify one instrument
 you'd like to use for the entire validation, or if you are using instrumental data
-you've created yourself, comment-in the line below:
-instrument = 'GOES-15''
+you've created yourself, comment-in the line: "instrument = 'GOES-15'"
+
 
 START AND END DATES
 ---
-FORMAT: integers
-EX: 2010, 5, 1
+FORMAT: integers  
+EX: 2010, 5, 1  
 OTHER NOTES: you do not actually have to have model output for your beginning and
 end dates. ValRE will simply extract all model files that are dated within the date
 range that you have specified. If you do not have dates specified in the names
@@ -111,8 +111,8 @@ close to each other and you do not already have observational output for them. T
 
 THRESHOLDS
 ---
-FORMAT: lists of integers or floats
-EX: [10,100]
+FORMAT: lists of integers or floats  
+EX: [10,100]  
 OTHER NOTES: indices of threshold lists must correspond to each other. Ie, if the first
 value in energy_thresholds is 10, the first value of the pfu_thresholds must be the
 corresponding flux value of 10. If the model you are using is probabilistic, you may
@@ -125,21 +125,16 @@ if it doesn't simply won't create a report for that threshold.
 
 REPORTS
 ---
-FORMAT: True or False boolean
+FORMAT: True or False boolean  
 OTHER NOTES: this is not either/or, both can be marked True if you'd like both reports
 and both can be marked False if you'd like none.
 
 MANUAL ADDITIONS
 ---
-FORMAT: lists of integers
-EX. [0,5]
+FORMAT: lists of integers  
+EX. [0,5]  
 OTHER NOTES: All of these value should be 0 if you have not completed any calculations yourself. Lists must be the same length as 
 energy_threshold determined in the thresholds category above, and each value is the amount of manual hits, misses, correct negatives, or 
 false alarms for the corresponding energy_threshold that has been calculated manually. These values can be added to if there are 
 particular events that ValRE is not able to use model and/or observational output to calculate, but you would still like to be included 
 for calculations of metric scores.
-
-More extensive documentation
-============================
-for more extensive documentation, ValRE utilizes the pydoc module. Find the documentation by typing
-"pydoc ValRE". Please note that doing so will also run the program. 
