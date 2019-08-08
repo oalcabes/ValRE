@@ -28,6 +28,10 @@ ValRE Assumptions
 - ValRE currently has no capability for an event in which the primary GOES instrument changes mid-event. It may crash or read
   the observed data incorrectly (although it's possible the code would still run fine, but check it). In order to account for such an   
   event, it may make sense to manually input the backup instrument.
+- all observation files ValRE creates are daily. If you have multiple model files for an individual day and an event starts in the       
+  evening, so some model files from the morning say all clear whereas model files in the evening do not, the morning model files will be 
+  read as "misses" because the observation file considers the entire day not clear. The best way to handle this problem would either be 
+  to merge model files into days, or to create your own observation files that correspond to the model files.
 
 Likely Edits
 ============
