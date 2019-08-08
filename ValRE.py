@@ -18,8 +18,6 @@ for qualitative verification.
 #%%
 ### LOADING LIBRARIES ###
 
-#note to phil: may be necessary to look into weird GOES08 or GOES09 flipping over (during events) primary inst if using further back events
-
 import json as js
 import os
 from pathlib2 import Path
@@ -58,7 +56,8 @@ styles = getSampleStyleSheet()
 num_thresholds = len(cfg.energy_threshold)
 remove_threshold = []
 report_elements=[]
-peak_diff = []
+peak_diff_flux = []
+peak_diff_time = []
 json_report = {}
 model_name = cfg.model_name
 
@@ -80,13 +79,26 @@ if cfg.PDF_report:
                                   style = styles['title'])
     date_of_report = Paragraph('Date of report: ' + str(datetime.today()),
                                style = styles['Normal'])
+    validation_window_report = Paragraph('Validation window: ' +
+                                         str(datetime(cfg.start_year,cfg.start_month,
+                                                      cfg.start_day))
+                                         + ' to ' + 
+                                         str(datetime(cfg.end_year,cfg.end_month,
+                                                      cfg.end_day)),
+                                         style = styles['Normal'])
     report_elements.append(model_name_report)
     report_elements.append(Spacer(1, 0.5*cm))
     report_elements.append(date_of_report)
+    report_elements.append(validation_window_report)
 
 if cfg.JSON_report:
     json_report['model_name'] = model_name
     json_report['date_of_report'] = str(datetime.today())
+    json_report['validation_window'] = {'start' : str(datetime(cfg.start_year,
+                                                               cfg.start_month,
+                                                               cfg.start_day)),
+                                        'end' : str(datetime(cfg.end_year,cfg.end_month,
+                                                             cfg.end_day))}
 
 json_report['thresholds'] = [None]*num_thresholds
 
@@ -111,7 +123,7 @@ def get_image(path, width=1*cm):
     aspect = ih / float(iw)
     return Image(path, width=width, height=(width * aspect))
 
-def generate_ref_sheet(output_path): #possibly add in input and output paths
+def generate_ref_sheet(output_path):
     """
     generate a PDF reference sheet specifying properties of metric scores
     """
@@ -322,8 +334,8 @@ def choose_prime_inst(given_start_date,given_end_date):
         instrument = 'GOES-' + inst_str
         print('we are using %s as our instrument for observations' %instrument)
 
-    except:
-        print('%s does NOT have data available' %inst_str)
+    except request.HTTPError:
+        print('GOES-%s does NOT have data available' %inst_str)
 
         if len(str(backup_inst)) == 2:
             inst_str = str(backup_inst)
@@ -342,8 +354,8 @@ def choose_prime_inst(given_start_date,given_end_date):
             print('we are using %s as our instrument for observations'
                   %instrument)
 
-        except:
-            print('no knowledge of backup or primary instrument - choosing'
+        except request.HTTPError:
+            print('no knowledge of backup or primary instrument - choosing '
                   'instrument based on available data')
             alternate_output = choose_inst(given_start_date,given_end_date)
 
@@ -404,22 +416,31 @@ def database_extraction(mod_start_time,mod_end_time,instrument_chosen):
                 katies_path = Path('output')
                 
                 obs_csv2json((katies_path / new_obs_name), obs_name,
-                              (ref_path / 'example_sepscoreboard_json_file_v20190228.json'))
+                              (ref_path/'example_sepscoreboard_json_file_v20190228.json'))
+                print('obs file created')
+                obs_record = True
                 
             except FileNotFoundError:
-                new_obs_name = ('sep_values_' + str(instrument) + '_integral_' +
-                                window_start_date.strftime('%Y_%m_%d')
-                                .replace('_0','_') + '.csv')
-                obs_name = (str(instrument) + '_' +
-                            str(mod_start_time.date()) + '.json')
-                katies_path = Path('output')
+                try:
+                    new_obs_name = ('sep_values_' + str(instrument) + '_integral_' +
+                                    window_start_date.strftime('%Y_%m_%d')
+                                    .replace('_0','_') + '.csv')
+                    obs_name = (str(instrument) + '_' +
+                                str(mod_start_time.date()) + '.json')
+                    katies_path = Path('output')
                 
-                obs_csv2json((katies_path / new_obs_name), obs_name,
-                              (ref_path / 'example_sepscoreboard_json_file_v20190228.json'))
-
-            print('obs file created')
-            obs_record = True
-
+                    obs_csv2json((katies_path / new_obs_name), obs_name,
+                                 (ref_path/'example_sepscoreboard_json_file_v20190228.json'))
+                
+                    print('obs file created')
+                    obs_record = True
+                
+                except FileNotFoundError:
+                    obs_record = False
+                    print('no SEP event recorded, observed all clear = true')
+                    all_clear_boolean_obs = 'true'              
+                    return([obs_record,all_clear_boolean_obs,instrument])
+                
             with open(obs_path / obs_name,'r') as o:
                 obs = js.load(o)
                 ('output files found - extracting values')
@@ -454,10 +475,8 @@ model_files = date_range(model_files,cfg.start_year,cfg.start_month,
 
 #%%
 ### COMPARING MODEL OUTPUT TO OBSERVATION OUTPUT ###
-#SOMETHING I MAY NEED TO DO - MAKE SURE THERE AREN'T MULTIPLE FILES FOR THE
-#SAME EVENT, IE W MAG 4
 
-peak_fig,peak_axes = plt.subplots(len(cfg.energy_threshold)) #move this?
+peak_fig,peak_axes = plt.subplots(len(cfg.energy_threshold))
 prob_fig,prob_axes = plt.subplots(len(cfg.energy_threshold))
 
 print('Comparing model output to observation output')
@@ -513,6 +532,14 @@ for f in model_files:
 
                     except KeyError:
                         probability_type_model = False
+                        
+                    try:
+                        peak_intensity_model = (all_forecasts[i]
+                                                ['peak_intensity']
+                                                ['intensity'])
+                        peak_type_model = True
+                    except:
+                        peak_type_model = False
 
                     if probability_type_model:
                         uncertainty=(all_forecasts[i]['probabilities'][0]
@@ -549,20 +576,16 @@ for f in model_files:
                         print('all clear boolean model = %s'
                               %all_clear_boolean_model)
 
-                    else:
+                    elif peak_type_model:
                         #extracting peak intensity values if the model
                         #doesn't have probability values
-
-                        peak_intensity_model = (all_forecasts[i]
-                                                ['peak_intensity']
-                                                ['intensity'])
+                        
                         print('model flux values found')
                         print('model peak intensity = %s'
                               %peak_intensity_model)
-
-
-                        #extracting peak times if they exist- if not just
-                        #using start time
+                        
+                            #extracting peak times if they exist- if not just
+                            #using start time
                         print('extracting peak time')
 
                         #NOTE: PROBABLY CHANGE THIS WHEN I FIX START TIME STUFF
@@ -609,6 +632,10 @@ for f in model_files:
 
                             print('all clear boolean model = %s'
                                   %all_clear_boolean_model)
+                    else:
+                        all_clear_boolean_model = (all_forecasts[i]['all_clear']
+                                                   ['all_clear_boolean'])
+                        print('all clear extracted')
 
                     #generating name of corresponding obs file
                     #will likely need to change this to make it more
@@ -620,9 +647,11 @@ for f in model_files:
                           'output folder')
                     #may need to change some stuff abt the obs name
 
-                    if str(mod_start_time.date()) in str(obs_files) or mod_start_time.strftime('%Y_%m_%d') in str(obs_files):
+                    if ((str(mod_start_time.date()) in str(obs_files)) or
+                    (mod_start_time.strftime('%Y_%m_%d') in str(obs_files))):
                         for obs_f in obs_files:
-                            if str(mod_start_time.date()) in str(obs_f) or mod_start_time.strftime('%Y_%m_%d') in str(obs_f):
+                            if ((str(mod_start_time.date()) in str(obs_f)) or
+                            (mod_start_time.strftime('%Y_%m_%d') in str(obs_f))):
                                 with open(obs_f,'r') as o:
                                     obs = js.load(o)
                                     ('output files found - extracting values')
@@ -714,10 +743,10 @@ for f in model_files:
                             correct_negatives[j] = correct_negatives[j]+1
 
                     try:
-                        peak_diff.append(abs(float(peak_intensity_model) -
-                                             float(peak_intensity_obs)))
+                        peak_diff_flux.append(float(peak_intensity_model) -
+                                             float(peak_intensity_obs))
                     except:
-                        print('no creation of peak diff')
+                        print('incorrect data for peak difference calculations')
 
 #%%
 				### PLOTS ###
@@ -784,7 +813,7 @@ for f in model_files:
 
                         peak_graph = False
 
-                    else:
+                    elif peak_type_model:
 
                         ### PLOTTING PEAK INTENSITY VALUES ###
 
@@ -818,7 +847,19 @@ print('comparison between model and observation finished')
 ### METRICS CALCULATIONS ###
 
 print('calculating metrics')
-model_type = 'probabilistic_discrete'
+
+if peak_type_model:
+    avg_diff_flux = np.average(peak_diff_flux)
+    #avg_diff_time = sum(peak_diff_time, timedelta(0)) / len(peak_diff_time)
+    #check that this calculation is correct
+    #be careful with time differences bc i think my peak time stuff is not always perfect
+            
+    peak_diffs_report = Paragraph('Average Peak Flux Difference = ' +
+                                  str(avg_diff_flux) + ' pfu', style = styles['Normal']) #<br />) +
+                                  #'Average Peak Time Difference = '
+                                  #+ str(avg_diff_time),
+                                  #)
+    report_elements.append(peak_diffs_report)
 
 #need to put in which threshold im using here
 for j in range(num_thresholds):
@@ -982,7 +1023,7 @@ for j in range(num_thresholds):
 
             instrument_report = Paragraph('Instrument used for observations: %s'
                                           %instrument, style = styles['Normal'])
-
+            
             #report_elements.append(JSC_skill_score)
             report_elements.append(instrument_report)
             report_elements.append(threshold_report)
@@ -990,6 +1031,7 @@ for j in range(num_thresholds):
             report_elements.append(t)
             report_elements.append(Spacer(1, 1*cm))
             report_elements.append(metrics_report)
+
             report_elements.append(PageBreak())
 
         if cfg.JSON_report:
@@ -1017,7 +1059,7 @@ for j in range(num_thresholds):
             prob_axes = prob_fig.axes
             #prob_fig.subplots_adjust(bottom=0.5)
             #prob_fig.frameon = False
-        else:
+        elif peak_type_model:
             peak_fig.delaxes(peak_axes[j])
             peak_axes = peak_fig.axes
 
@@ -1055,7 +1097,8 @@ if peak_graph:
     peak_fig.tight_layout()
     peak_fig.savefig((png_out / (model_name + '_peak_intensities.png')),dpi=1000)
 
-    peak_intensities = get_image((png_out / (model_name + '_peak_intensities.png')),width=15*cm)
+    peak_intensities = get_image((png_out / (model_name + '_peak_intensities.png')),
+                                 width=15*cm)
     peak_intensities.hAlign = 'RIGHT'
 
 else:
@@ -1136,7 +1179,7 @@ print('finalizing report')
 if ROC_exist:
     report_elements.append(ROC_report)
 
-if not probability_type_model:
+if peak_type_model:
     report_elements.append(peak_intensities)
 
 if prob_graph:
