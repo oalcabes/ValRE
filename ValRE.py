@@ -678,6 +678,7 @@ for f in model_files:
                     
                         if obs_record:
                             obs_events = db[1]
+                            obs_files = [f for f in obs_path.rglob('*.json')]
                         else:
                             all_clear_boolean_obs = db[1]
 
@@ -707,24 +708,28 @@ for f in model_files:
                         peak_time_obs = parse(peak_time_obs)
 
                         print('peak values extracted')
-
-                        #observed all clear boolean
-                        print('extracting observed all clear')
-                        try:
-                            all_clear_boolean_obs = (obs_events[k]
-                            ['all_clear_boolean']) #all clear value
-                            print('all clear value extracted')
-                            print('all clear boolean observation = %s'
+                        
+                        if mod_end_time < obs_start_time:
+                            all_clear_boolean_obs = 'true'
+                            
+                        else:
+                            #observed all clear boolean
+                            print('extracting observed all clear')
+                            try:
+                                all_clear_boolean_obs = (obs_events[k]
+                                ['all_clear_boolean']) #all clear value
+                                print('all clear value extracted')
+                                print('all clear boolean observation = %s'
                                   %all_clear_boolean_obs)
-                        except:
-                            print('all clear boolean not given - calculating')
-                            if peak_intensity_obs >= flux_threshold:
-                                all_clear_boolean_obs = 'false'
-                            else:
-                                all_clear_boolean_obs = 'true'
-                            print('all clear boolean calculated')
-                            print('all clear boolean observation'
-                                  '= %s' %all_clear_boolean_obs)
+                            except:
+                                print('all clear boolean not given - calculating')
+                                if peak_intensity_obs >= flux_threshold:
+                                    all_clear_boolean_obs = 'false'
+                                else:
+                                    all_clear_boolean_obs = 'true'
+                                print('all clear boolean calculated')
+                                print('all clear boolean observation'
+                                      '= %s' %all_clear_boolean_obs)
 
                         print('data extracted')
 
