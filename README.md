@@ -30,6 +30,10 @@ Python Libraries
 Before running ValRE, you must make sure you have the correct Python libraries loaded on your computer.
 Most of these libraries are included in Anaconda Navigator. However, it may be necessary to install some
 yourself. In order to do so, type: "pip install <library>".
+   
+Libraries you will likely have to install:
+pip install wget
+pip install reportlab
 
 This program makes use of the software "operational_sep_quantities" created by Katie Whitman, a program
 which has extensive that can be found with the command "pydoc operational_sep_quantities".
