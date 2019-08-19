@@ -6,9 +6,7 @@ which are written into reports (in PDF and/or JSON format). ValRE also creates p
 for qualitative verification, which appear in the PDF and are present as PNG files in the
 validation_reports/figures folder.
 
-***NOTE: ValRE was not intended for the creation of model output. Model output must already
-be present before running ValRE; however, given model output, ValRE has the capability of
-generating the necessary observational output from the iswa GOES database.
+***NOTE: ValRE was not intended for the creation of model output or observational output. You must already have output present in some directory on your computer in order to run ValRE.
 
 NOTE: IF YOU NEED TO ALTER THE CODE, PLEASE READ ValRE_ADDITIONS.TXT
 
