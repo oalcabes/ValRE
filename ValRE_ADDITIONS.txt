@@ -17,21 +17,6 @@ what my code does:
   - note: plots are included in the PDF report, but not in the JSON report. Individual PNG files of plots can be found in the
   validation_reports/figures folder.
 
-ValRE Assumptions
-=================
-- all output files have some string of the date in them in the forms: YYYY-MM-DD or YYYY_MM_DD
-- all output files are in the JSON form created by the CCMC (this example format can be found in
-  ref_files/example_sepscoreboard_json_file_v20190228.json - however, please do not move/alter this file from its current directory as     ValRE may need to read it in. If you need to use it please just copy it)
-- if an observed event starts before midnight but the model doesn't pick it up until after midnight, ValRE will interpret
-  such an event as one miss and one hit as opposed to one late hit. If you know about such an event, I suggest merging the two files
-  into one, which should fix the problem
-- ValRE currently has no capability for an event in which the primary GOES instrument changes mid-event. It may crash or read
-  the observed data incorrectly (although it's possible the code would still run fine, but check it). In order to account for such an   
-  event, it may make sense to manually input the backup instrument.
-- all observation files ValRE creates are daily. If you have multiple model files for an individual day and an event starts in the       
-  evening, so some model files from the morning say all clear whereas model files in the evening do not, the morning model files will be 
-  read as "misses" because the observation file considers the entire day not clear. The best way to handle this problem would either be 
-  to merge model files into days, or to create your own observation files that correspond to the model files.
 
 Likely Edits
 ============
