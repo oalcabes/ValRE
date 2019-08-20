@@ -12,12 +12,9 @@ Created on Wed Jul  3 09:25:07 2019
 ValRE validates spaceweather forecasting models of SEP events. Validation is done by
 comparing model forecasts of events to historical observations and generating skill scores,
 which are written into reports (in PDF and/or JSON format). ValRE also creates plots
-for qualitative verification.
+for qualitative verification. To run ValRE, you must edit the configuration file
+(config.py) included in the ValRE package.
 """
-
-
-
-#NEED TO : DEAL WITH THRESHOLDS THAT I DONT HAVE MODEL OUTPUT FOR
 
 #%%
 ### LOADING LIBRARIES ###
@@ -32,7 +29,6 @@ import config as cfg
 from matplotlib import pyplot as plt, dates as mdates
 from reportlab.lib import utils, colors
 from reportlab.lib.units import cm
-from reportlab.lib.styles import ParagraphStyle
 from reportlab.lib.pagesizes import letter
 from reportlab.platypus import (SimpleDocTemplate, Paragraph, Spacer, Image,
                                 Table, TableStyle, PageBreak)
@@ -47,29 +43,32 @@ from sklearn.metrics import roc_curve, auc
 register_matplotlib_converters()
 styles = getSampleStyleSheet()
 
-
 #%%
 ### DEFINING UNIVERSAL VARIABLES ###
 
 #lists
 num_thresholds = len(cfg.energy_threshold)
 remove_threshold = []
-report_elements=[]
 rel_change = []
 peak_diff_time = []
 warning_times = []
 observation_instruments = []
+
+#reports
 json_report = {}
+report_elements=[]
+
+#model info
 model_name = cfg.model_name
 mod_type = 'undef'
 
-instrument_chosen = False
-
+#contingency table values
 hits = np.zeros(num_thresholds)
 false_alarms = np.zeros(num_thresholds)
 misses = np.zeros(num_thresholds)
 correct_negatives = np.zeros(num_thresholds)
 
+#values for ROC (Relative Operating Characteristic) graph
 ROC_thresholds = [0,.1,.2,.3,.4,.5,.6,.7,.8,.9,1]
 ROC_h = np.zeros(len(ROC_thresholds))
 ROC_m = np.zeros(len(ROC_thresholds))
@@ -78,45 +77,44 @@ ROC_cn = np.zeros(len(ROC_thresholds))
 ROC_H = np.zeros(len(ROC_thresholds))
 ROC_F = np.zeros(len(ROC_thresholds))
 
-#paths
-
-
 #%%
 ### REPORT HEADERS ###
 
+#creating header of PDF report
 if cfg.PDF_report:
     model_name_report = Paragraph('%s Validation Report' %model_name,
                                   style = styles['title'])
-    date_of_report = Paragraph('Date of report: ' + str(datetime.today()),
+    date_of_report = Paragraph('Date of report: ' + datetime.today().replace(microsecond=0).isoformat(),
                                style = styles['Normal'])
     validation_window_report = Paragraph('Validation window: ' +
-                                         str(datetime(cfg.start_year,
-                                                      cfg.start_month,
-                                                      cfg.start_day))
+                                         date(cfg.start_year,
+                                              cfg.start_month,
+                                              cfg.start_day).isoformat()
                                          + ' to ' + 
-                                         str(datetime(cfg.end_year,
-                                                      cfg.end_month,
-                                                      cfg.end_day)),
+                                         str(date(cfg.end_year,
+                                                  cfg.end_month,
+                                                  cfg.end_day)),
                                          style = styles['Normal'])
     report_elements.append(model_name_report)
     report_elements.append(Spacer(1, 0.5*cm))
     report_elements.append(date_of_report)
     report_elements.append(validation_window_report)
 
+#creating header of JSON report
 if cfg.JSON_report:
     json_report['model_name'] = model_name
-    json_report['date_of_report'] = str(datetime.today())
-    json_report['validation_window'] = {'start' : str(datetime(cfg.start_year,
-                                                               cfg.start_month,
-                                                               cfg.start_day)),
-                                        'end' : str(datetime(cfg.end_year,
-                                                             cfg.end_month,
-                                                             cfg.end_day))}
+    json_report['date_of_report'] = datetime.today().replace(microsecond=0).isoformat()
+    json_report['validation_window'] = {'start' : date(cfg.start_year,
+                                                           cfg.start_month,
+                                                           cfg.start_day).isoformat(),
+                                        'end' : date(cfg.end_year,
+                                                         cfg.end_month,
+                                                         cfg.end_day).isoformat()}
 
-json_report['thresholds'] = [None]*num_thresholds
+    json_report['thresholds'] = [None]*num_thresholds
 
-### CREATING OUTPUT DIRECTORY ###
-
+### CREATING OUTPUT DIRECTORIES IF NOT ALREADY PRESENT ###
+    
 Path('validation_reports').mkdir(exist_ok=True)
 val_out = Path('validation_reports')
 Path(val_out / 'figures').mkdir(exist_ok=True)
@@ -140,13 +138,13 @@ def generate_ref_sheet(output_path):
     """
     generate a PDF reference sheet specifying properties of metric scores
     """
-    
+    #header of reference sheet
     ref_out = Path(output_path)
     reference_elements=[]
     title = Paragraph('Validation Reference Sheet', style=styles['title'])
     reference_elements.append(title)
 
-    #creating metric score table
+    #creating table with properties of metric scores
     metric_ref = (['Metrics Reference Table','','',''],
                   ['Name', 'Attribute','Range','Perfect Score'],
                   ['Percent Correct','Accuracy','0 to 1', '1'],
@@ -187,7 +185,9 @@ def generate_ref_sheet(output_path):
                                           ('SPAN',(0,15),(1,15)),
                                           ('SPAN',(0,16),(1,16)),
                                           ('SPAN',(0,17),(1,17)),
-                                          ('SPAN',(0,18),(1,18))]))
+                                          ('SPAN',(0,18),(1,18)),
+                                          ('SPAN',(0,19),(1,19)),
+                                          ('SPAN',(0,20),(1,20))]))
 
     #writing report
     reference_elements.append(metric_ref_table)
@@ -196,12 +196,11 @@ def generate_ref_sheet(output_path):
                                   pagesize=letter)
     reference.build(reference_elements)
 
-#choosing files from a specific date range
 def date_range(all_files,start_year,start_month,start_day,end_year,end_month,
                end_day):
     """
     from a list of files, extract only files within a given date range.
-    inputs are numbers.
+    inputs are integers.
     """
 
     d1 = date(start_year,start_month,start_day)
@@ -221,6 +220,10 @@ def date_range(all_files,start_year,start_month,start_day,end_year,end_month,
     
     
 def calc_all_clear_flux(peak_intensity,flux_threshold):
+    """
+    calculate an all clear value based on whether or not the peak flux has
+    crossed the flux threshold
+    """
     
     print('calculating all clear boolean using peak flux and threshold')
     if peak_intensity >= flux_threshold:
@@ -233,6 +236,10 @@ def calc_all_clear_flux(peak_intensity,flux_threshold):
     return(all_clear_boolean)
                             
 def calc_all_clear_prob(prob,prob_threshold):
+    """
+    calculate an all clear value based on whether or not the probability that an
+    event will happen has crossed the probability threshold
+    """
     
     print('calculating all clear boolean using probability and threshold')
     if prob >= prob_threshold:
@@ -245,6 +252,11 @@ def calc_all_clear_prob(prob,prob_threshold):
     return(all_clear_boolean)
     
 def determine_mod_type(all_forecasts,i):
+    """
+    determine whether a model is deterministic (has flux values), probabilistic,
+    or neither based on whether or not flux or probability values are present in the
+    model output
+    """
     
     print('determining type of model')
     
@@ -273,112 +285,92 @@ def determine_mod_type(all_forecasts,i):
     
     return(mod_type)
       
-def extract_mod_values(all_forecasts,mod_type,i,energy_threshold):
+def extract_mod_values(all_forecasts,mod_type,i,flux_threshold,prob_threshold):
+    """
+    extract values needed for validation from a model file for a given proton energy
+    threshold. if the model is probabilistic, probability, probability threshold, and all
+    clear values will be extracted. if a model is deterministic, peak flux, peak time,
+    and all clear values will be extracted. if a model is neither, only all clear values
+    will be extracted.
+    """
     
-    mod_values = {"probability" : 'undef', "prob_threshold" : "undef",
-                  "peak_flux" : "undef", "peak_time" : "undef", #consider extracting flux threshold as well
-                  "all_clear" : "undef", "type" : mod_type}
+    mod_values = {"probability" : 'undef', "peak_flux" : "undef",
+                  "peak_time" : "undef", "all_clear" : "undef", "type" : mod_type}
     
+    #if model type is undefined, try to define it
     if mod_type ==  'undef':
         mod_values["type"] = determine_mod_type(all_forecasts,i)
         mod_type = mod_values["type"]
-    
+        
+    #if model is probabilistic, extract probability values
     if mod_type == 'prob':
         mod_values["probability"] = float(all_forecasts[i]['probabilities'][0]
                                           ['probability_value'])
-        #uncertainty=(all_forecasts[i]['probabilities'][0]['uncertainty'])
-        mod_values["probability_threshold"] = float(all_forecasts[i]
-                                                    ['all_clear']
-                                                    ['probability_threshold'])
 
         print('model predicted probability values found')
         print('probability = %s' %mod_values["probability"])
-        #print('uncertainty = %s' %uncertainty)
         print('probability threshold = %s'
               %mod_values["probability_threshold"])
 
         print('extracting all clear boolean from model')
         
+        #if model output has an all clear, extract it. if not, use probability
+        #and threshold values to calculate it
         try:
-            #if model output has an all clear, extract it
             mod_values["all_clear"] = str(all_forecasts[i]['all_clear']
                                          ['all_clear_boolean']).lower()
             print('all clear extracted')
-
         except NameError:
             print('all clear not present in file - calculating')
-            mod_values["all_clear"] = calc_all_clear_prob(probability,mod_values["probability_threshold"])
+            mod_values["all_clear"] = calc_all_clear_prob(probability,prob_threshold)
                                     
         print('all clear boolean model = %s' %mod_values["all_clear"])
         return(mod_values)
-
-    elif mod_type == 'flux':
-        #extracting peak intensity values if the model
-        #doesn't have probability values        
-        mod_values["peak_flux"] = float(all_forecasts[i]['peak_intensity']['intensity'])
-                        
+    #if model type is deterministic, extract flux values
+    elif mod_type == 'flux':      
+        mod_values["peak_flux"] = float(all_forecasts[i]['peak_intensity']['intensity'])                        
         print('model flux values found')
         print('model peak intensity = %s' %mod_values["peak_flux"])
                         
-        #extracting peak times if they exist- if not just
-        #using start time
+        #extracting peak times if they exist
         print('extracting peak time')
-
-    #NOTE: PROBABLY CHANGE THIS WHEN I FIX START TIME STUFF
         try:
             mod_values["peak_time"] = (all_forecasts[mod_i]['peak_intensity']['time'])
             mod_values["peak_time"] = parse(mod_values["peak_time"])
                                     
             print('peak time found')
             print('peak time = %s' %mod_values["peak_time"])
-
         except:
             print('no peak time found') #keeping it as undefined
 
-#extracting all clear boolean if model has, if not
-#calculating it
+        #extracting all clear boolean if model has, if not calculating it
         print('extracting model all clear boolean')
         
         try:
             mod_values["all_clear"] = str(all_forecasts[mod_i]['all_clear']
                                          ['all_clear_boolean']).lower()
             print('all clear extracted')
-
         except KeyError:
-            #calculating all clear boolean using peak intensities
-            #and thresholds
-            #(it may be possible to do this more efficiently)
             print('all clear not found - calculating using fluxes and threshold')
-            flux_threshold = (cfg.pfu_threshold[cfg.energy_threshold.index(energy_threshold)]) #this needs energy threshold parameter added
             mod_values["all_clear"] = calc_all_clear_flux(mod_values["peak_flux"],flux_threshold)
 
         print('all clear calculated')
-
         print('all clear boolean model = %s' %mod_values["all_clear"])
         
         return(mod_values)
-    
-    elif mod_type == 'none':
-        
+    #if model is not deterministic or probabilistic, extracting all clear value
+    elif mod_type == 'none':     
         try:
-            mod_values["all_clear"] = str(all_forecasts[mod_i]['all_clear']['all_clear_boolean']).lower
+            mod_values["all_clear"] = str(all_forecasts[mod_i]['all_clear']['all_clear_boolean']).lower()
             print('all clear extracted')
             
-            return(mod_values)
-            
+            return(mod_values)         
         except:
             print('NO VALUES FOUND FOR THIS MODEL FILE')
-            #probably raise an exception
-            
-#%%
-### NEED TO WRITE SOME CODE HERE EITHER GENERATING OBSERVATIONAL OUTPUT OR GETTING OUTPUT FROM A DATABASE ###
-            #can literally be based on what model output you have
-            #but should still be changed to this order
 
 #%%
 ### LOADING IN FILES ###
-
-print('Validation begun')
+            
 #getting path names
 model_path = Path(cfg.model_path)
 obs_path = Path(cfg.obs_path)
@@ -388,11 +380,10 @@ print('Loading in model and observation files')
 model_files = [f for f in model_path.rglob("*.json")] #these are just file names
 obs_files = [f for f in obs_path.rglob('*.json')]
 
-print('Extracting files from chosen date range')
+print('Reducing to files from chosen date range')
 #get only files within given date range
 model_files = date_range(model_files,cfg.start_year,cfg.start_month,
                          cfg.start_day,cfg.end_year,cfg.end_month,cfg.end_day)
-
 obs_files = date_range(obs_files,cfg.start_year,cfg.start_month,cfg.start_day,
                        cfg.end_year,cfg.end_month,cfg.end_day)
 
@@ -400,18 +391,20 @@ obs_files = date_range(obs_files,cfg.start_year,cfg.start_month,cfg.start_day,
 ### COMPARING MODEL OUTPUT TO OBSERVATION OUTPUT (MAIN CODE) ###
 
 #initializng plots
+print('initializing plots')
 peak_fig,peak_axes = plt.subplots(len(cfg.energy_threshold))
 prob_fig,prob_axes = plt.subplots(len(cfg.energy_threshold))
 
-print('Comparing observation output to model output')
+print('Validation begun')
 
+#comparing forecast and observed for each observed event
+#assuming one observation file per event
 for f in obs_files:
     print(f)
     if os.stat(f).st_size > 0: #choosing only files that aren't blank
-        print('checked blank')    
         mod_event_files = [] #resetting list for corresponding model files
         
-        #extract output from file
+        #extracting observation output
         with open(f, 'r') as o:
             print('loading output')
             obs = js.load(o) #loading in json files
@@ -420,19 +413,21 @@ for f in obs_files:
             instrument = (obs['sep_forecast_submission']['triggers'][0]
                              ['particle_intensity']['observatory'])
             
+            #recording which instrument was used
             if instrument not in (observation_instruments):
                 observation_instruments.append(instrument)
+                
+    else:
+        print('observation file is blank - skipping')
             
-    #looking at each forecast in observation file
+    #looking at each energy channel present in observation file
     for i in range(len(obs_events)):
-        print('going through available energy channels')
-
         energy_threshold = (obs_events[i]['energy_min'])
-        print('energy_threshold = %s' %energy_threshold)
+        print('event recorded for %s MeV energy channel' %energy_threshold)
 
         #only looking at forecasts for given energy channels
         if float(energy_threshold) in cfg.energy_threshold:
-            print('energy threshold matches given energy thresholds - comparing '
+            print('energy channel wanted for validation - comparing '
                   'to model files')
             
             #figuring out what index in configuration lists  we're using
@@ -466,17 +461,15 @@ for f in obs_files:
                       %all_clear_boolean_obs)
             except:
                 print('all clear boolean not given - calculating')
-                all_clear_boolean_obs = calc_all_clear_flux(peak_intensity_obs,flux_threshold) #STILL NEED TO PUT IN FLUX THRESHOLD                   
+                all_clear_boolean_obs = calc_all_clear_flux(peak_intensity_obs,flux_threshold)                  
             
-            #finding all model files with dates matching either day of event
-            #or day before (goal 24 hr before event)
+            
+            ### MODEL ###
+            #finding all model files within given range before event starts
             print('finding model files that correspond to this observation')
             day_list=[]
-            for d in range(2):
-                day_list.append((obs_start_time - timedelta(days=d)).date()) #probably don't need this code to be so intense
-                                     
-            #day_match = [i for i in day_list if str(i) in str(model_files) or
-            #             (i.strftime('%Y_%m_%d') in str(model_files))]
+            for d in range(cfg.days_before_event):
+                day_list.append((obs_start_time - timedelta(days=d)).date())
             
             #creating list of these model files
             for day in day_list:
@@ -484,7 +477,7 @@ for f in obs_files:
                     if str(day) in str(m) or day.strftime('%Y_%m_%d') in str(m):
                         mod_event_files.append(m)
                        
-            print('list of model files corresponding to event: %s' %mod_event_files)
+            print('model files corresponding to event: %s' %mod_event_files)
             
             #checking to see if there actually are model files
             if len(mod_event_files) == 0:
@@ -492,9 +485,7 @@ for f in obs_files:
                 mod_record = False
             else:
                 mod_record = True
-                
- ### MODEL ###
- 
+            
             #creating lists for model values from all model files 
             mod_peak_list = []
             mod_peak_times = []
@@ -504,7 +495,7 @@ for f in obs_files:
             mod_issue_times = []
             
             for mod_f in mod_event_files:
-                print(mod_f)
+                #print(mod_f)
                 with open(mod_f, 'r') as m:                           
                     mod_output = js.load(m)                        
                     all_forecasts = mod_output['sep_forecast_submission']['forecasts']
@@ -512,12 +503,12 @@ for f in obs_files:
                 
                 #check to see if model has a forecast for the current energy threshold
                 for k in range(len(all_forecasts)):
-                    if all_forecasts[k]['energy_channel']['min'] == energy_threshold: # for now
+                    if all_forecasts[k]['energy_channel']['min'] == energy_threshold:
                         mod_i = k
                         mod_record = True
-                        print('model has forecast for energy channel %s' %energy_threshold)
+                        print('model has forecast for energy channel %s MeV' %energy_threshold)
                     else:
-                        print('no model forecast for this energy channel')
+                        print('no model forecast for energy channel %s MeV' %energy_threshold)
                         mod_record = False
                 
                 #if model has a forecast for the energy channel, extract forecast
@@ -529,7 +520,8 @@ for f in obs_files:
                                  ['start_time'])
                     mod_end_time=(all_forecasts[mod_i]['prediction_window']
                                 ['end_time'])
-                     #putting start and end times in datetime formats 
+                    
+                    #putting start and end times in datetime formats 
                     try:
                         mod_start_time = parse(mod_start_time)
                         mod_end_time = parse(mod_end_time)
@@ -545,20 +537,21 @@ for f in obs_files:
                         
                     print('checking if model recorded event')
                     #checking to see if this file actually contains the event                   
-                    if mod_end_time < obs_start_time: #model file ends before event starts
-                        print('model file too early - skipping')
-                        mod_on_time = False             
-                    elif obs_start_time < mod_start_time: #model file begins after event ends
-                        print('model file too late - skipping')
-                        mod_on_time = False                 
-                    elif obs_start_time < mod_end_time: #mod end time occurs within event window, using this file
+                    if mod_end_time < obs_start_time:
+                        #model forecast ends before event starts
+                        print('model file too early - skipping')            
+                    elif obs_start_time < mod_start_time:
+                        #model forecast begins after event ends
+                        print('model file too late - skipping')                
+                    elif obs_start_time < mod_end_time:
+                        #model forecast starts before event begins and ends after
+                        #event starts, so using this file
                         print('model file recorded event')
-                        mod_on_time = True
-                    
-                    if mod_on_time:
+        
                         #extract model values
                         mod_values = extract_mod_values(all_forecasts,mod_type,
-                                                        mod_i,energy_threshold)                       
+                                                        mod_i,flux_threshold,
+                                                        cfg.prob_threshold)                       
                         #determining what type of model it is
                         mod_type = mod_values["type"]                  
                         #adding model all clear value to all clear list
@@ -576,32 +569,44 @@ for f in obs_files:
                         elif mod_type == 'prob':
                             mod_probs.append(mod_values['prob'])
                             mod_prob_times.append(mod_start_time)
+                else:
+                    print('skipping file')
 
+            #checking if any of the model files actually had viable all clear forecasts
             if len(all_clear_boolean_model) == 0:
-                print('no model files available for this event')
+                print('no model forecasts available for this event')
                 mod_record = False
             else:
                 mod_record = True
-                
-            print('all clear boolean model %s' %all_clear_boolean_model)
-                     
-            #NOTE: possibly add something that calculates warning time
+                print('list of model all clears: %s' %all_clear_boolean_model)
                              
 #%% 
             #creating values for plots
             if mod_record:
                 
-                #peak intensity value
+                #forecast peak intensity value
                 if mod_type == 'flux':
-                    peak_intensity_model = max(mod_peak_list)
-                    peak_time_model = mod_peak_times[mod_peak_list.index(peak_intensity_model)]
-                #probability value
+                    #if a threshold is crossed, extract the first flux value
+                    #that crosses the threshold. otherwise extract the highest
+                    if 'false' in all_clear_boolean_model:
+                        peak_intensity_model = mod_peak_list[all_clear_boolean_model.index('false')]
+                        peak_time_model = mod_peak_times[all_clear_boolean_model.index('false')]
+                    else:
+                        peak_intensity_model = max(mod_peak_list)
+                        peak_time_model = mod_peak_times[mod_peak_list.index(peak_intensity_model)]                   
+                #forecast probability value
                 elif mod_type == 'prob':
-                    probability = max(mod_probs)
-                    prob_time = mod_prob_times[mod_probs.index(probability)]
+                    #if a threshold is crossed, extract the first probability value
+                    #that crosses the threshold. otherwise extract the highest
+                    if 'false' in all_clear_boolean_model:
+                        probability = mod_probs[all_clear_boolean_model.index('false')]
+                        prob_time = mod_prob_times[all_clear_boolean_model.index('false')]
+                    else:
+                        probability = max(mod_probs)
+                        prob_time = mod_prob_times[mod_probs.index(probability)]
                 
-                ### CREATING VALUES FOR CONTINGENCY TABLES ###
-                print('creating values for contingency table')
+                ### CREATING VALUE FOR CONTINGENCY TABLE ###
+                print('creating value for contingency table')
                 if str(all_clear_boolean_obs).lower() == 'false':
                     if 'false' in all_clear_boolean_model:
                         hits[j] = hits[j] + 1
@@ -614,8 +619,11 @@ for f in obs_files:
                         false_alarms[j] = false_alarms[j]+1
                     else:
                         correct_negatives[j] = correct_negatives[j]+1
-                    
+                
+                #calculating relative change (later to be used when calculating mean
+                #percent error and mean absolute percent error)
                 try:
+                    print('calculating peak intensity differences')
                     rel_change.append((float(peak_intensity_obs) - float(peak_intensity_model))/float(peak_intensity_obs))
                 except:
                     print('incorrect data for peak difference calculations')
@@ -690,24 +698,32 @@ for f in obs_files:
                                            float(peak_intensity_obs),xdate=True,
                                            ydate=False,marker='o',c='blue',
                                            label='observation')
- 
+        else:
+            print('energy channel not chosen for validation - skipping')
+    
 print('comparison between model and observation finished')
 
 #%%
 ### METRICS CALCULATIONS ###
 
-#NEED TO: CONSIDER CALCULATING MEAN SQUARE USING PEAK DIFFERENCES
-#ALSO CONSIDER CALCULATING AVG WARNING TIME
-
 print('calculating metrics')
 
-    
+#average warning time
+print('calculating average warning time')
 avg_warning_time = np.mean(warning_times)
-warning_time_report = Paragraph('Average Warning Time = ' +
-                                 str(avg_warning_time), style = styles['Normal'])
-report_elements.append(warning_time_report)
+avg_warning_time = avg_warning_time - timedelta(microseconds=avg_warning_time.microseconds)
+#adding average warning time to reports
+if cfg.PDF_report:
+    warning_time_report = Paragraph('Average Warning Time = ' +
+                                    str(avg_warning_time), style = styles['Normal'])
+    report_elements.append(warning_time_report)
+    
+if cfg.JSON_report:
+    json_report['avg_warning_time'] = str(avg_warning_time)
 
+#calculating mean percent error and mean absolute error if forecast fluxes available
 if mod_type == 'flux':
+    print('calculating mean percent error and mean absolute error')
     rel_change = np.array(rel_change)
     
     #mean percent error
@@ -718,7 +734,7 @@ if mod_type == 'flux':
 
 #calculating metric scores for each given threshold
 for j in range(num_thresholds):
-    print('metrics for energy threshold %s MeV' %cfg.energy_threshold[j])
+    print('calculating all other metrics for energy threshold %s MeV' %cfg.energy_threshold[j])
 
     #hits
     h = hits[j] + cfg.man_hits[j]
@@ -737,6 +753,7 @@ for j in range(num_thresholds):
     if t == 0:
         print('no data for this threshold, no metric scores calculated' )
         threshold_avail = False
+        break
     else:
         threshold_avail = True
 
@@ -805,7 +822,7 @@ for j in range(num_thresholds):
 ### WRITING REPORTS ###
     
     if threshold_avail:
-        print('writing validation report')
+        print('writing validation report for %s MeV energy channel' %cfg.energy_threshold[j])
 
         #writing metrics into PDF report
         if cfg.PDF_report:
@@ -862,10 +879,6 @@ for j in range(num_thresholds):
                                    ('BACKGROUND',(2,2),(2,2),colors.mistyrose),
                                    ('BACKGROUND',(2,3),(2,3),colors.palegreen),
                                    ('SPAN',(0,0),(1,0))]))
-        
-        
-            #in the future may want to generate one value for JSC skill score
-           #JSC_skill_score = Paragraph('skill score = 1000',style = styles['Normal'])
            
             #putting the threshold into the report
             threshold_report = Paragraph('Energy Threshold = ' +
@@ -874,20 +887,19 @@ for j in range(num_thresholds):
                                          str(cfg.pfu_threshold[j]) + ' pfu',
                                          style = styles['Normal'])
 
-            #putting the instrument into the report
+            #putting the instruments used for observations into the report
             instrument_report = Paragraph('Instruments used for observations: %s'
                                           %observation_instruments, style = styles['Normal'])
             
             #adding all of these objects to the report list
-            #report_elements.append(JSC_skill_score)
             report_elements.append(instrument_report)
             report_elements.append(threshold_report)
             report_elements.append(Spacer(1, 0.5*cm))
             report_elements.append(t)
             report_elements.append(Spacer(1, 1*cm))
             report_elements.append(metrics_report)
-
             report_elements.append(PageBreak())
+            
         #writing metrics into json report
         if cfg.JSON_report:
             if mod_type == 'prob' or mod_type == 'undef':
@@ -930,15 +942,11 @@ for j in range(num_thresholds):
             #metric skills
             json_report['thresholds'][j]['metric_scores'] = metrics_dict
 
-#%%
-
     #deleting subplots on graphs if model didn't have forecasts for this threshold
     else:
         if mod_type == 'prob':
             prob_fig.delaxes(prob_axes[j])
             prob_axes = prob_fig.axes
-            #prob_fig.subplots_adjust(bottom=0.5)
-            #prob_fig.frameon = False
         elif mod_type == 'flux':
             peak_fig.delaxes(peak_axes[j])
             peak_axes = peak_fig.axes
@@ -1005,7 +1013,7 @@ if ROC_exist:
     ROC_ax.plot(ROC_F,ROC_H)
     ROC_auc = auc(ROC_F,ROC_H)
     
-    #this is where I generate RSS score
+    #generate RSS score
     RSS = 2*(ROC_auc - 0.5)
     print('ROC_F = %s' %ROC_F)
     print('ROC_H = %s' %ROC_H)
@@ -1014,17 +1022,17 @@ if ROC_exist:
     if cfg.JSON_report:
         json_report['RSS'] = RSS
         
-    ROC_ax.text('RSS = %s' %RSS)
+    ROC_ax.text(0.75, 0.75, 'RSS = %s' %RSS)
     ROC_ax.set_ylabel('Hit Rate')
     ROC_ax.set_xlabel('False Alarm Rate')
     ROC_ax.set_title('ROC curve')
-    print('ROC_auc = %s' %ROC_auc)
     
     #saving figure and adding to PDF report
     ROC_fig.savefig((png_out / (model_name + '_ROC_curve.png')),dpi=1000)
     ROC_report = get_image((png_out / (model_name + '_ROC_curve.png')),width=10*cm)
 else:
-    RSS = 'N/A'
+    if cfg.JSON_report:
+        json_report['RSS'] = 'N/A'
     print('No ROC curve created')
 
 if prob_graph:
@@ -1032,17 +1040,15 @@ if prob_graph:
     for ax in prob_axes:
         ax.xaxis_date()
         ax.set_ylabel('probability')
-            #note: change this based on data
         ax.xaxis.set_major_formatter(mdates.DateFormatter('%m.%d.%y'))
         ax.xaxis.set_major_locator(plt.MaxNLocator(5))
 
+    #creating horizontal lines for probability thresholds
     for l in range(len(prob_axes)):
-        try:
-            thresh_line = prob_axes[l].axhline(cfg.prob_threshold[l],c='black',
-                                      label='probability threshold')
-        except:
-            thresh_line = prob_axes[l].axhline(mod_values["probability_threshold"],
-                                               c='black', label='probability threshold')
+        thresh_line = prob_axes[l].axhline(cfg.prob_threshold[l],c='black',
+                                           label='probability threshold')
+
+    #legend            
     handles, labels = prob_fig.gca().get_legend_handles_labels()
     by_label = OrderedDict(zip(labels, handles))
     prob_axes[len(prob_axes) - 1].legend(by_label.values(), by_label.keys(),
@@ -1050,14 +1056,15 @@ if prob_graph:
                                          bbox_transform=prob_axes[len(prob_axes)
                                                                  - 1].transAxes,
                                          bbox_to_anchor = (1.5,-0.6),ncol=3)
-#note: legend is not fully in figure for some reason
+
     prob_axes[0].set_title('Probabilities for Chosen Events')
     prob_axes[len(prob_axes) - 1].set_xlabel('event time')
     prob_fig.subplots_adjust()
     prob_fig.tight_layout()
+    
+    #saving figure and adding to PDF report
     prob_fig.savefig((png_out / (model_name + '_probabilities.png')),
                      dpi=1000,bbox_inches='tight')
-
     probability_graph = get_image((png_out / (model_name + '_probabilities.png')),
                                   width=15*cm)
     probability_graph.hAlign = 'RIGHT'
@@ -1072,23 +1079,30 @@ print('total misses = %s' %(misses+cfg.man_misses))
 
 #%%
 
-print('finalizing report')
+print('finalizing reports')
 
-if ROC_exist:
-    report_elements.append(ROC_report)
 
-if mod_type == 'flux':
-    report_elements.append(peak_intensities)
-
-if prob_graph:
-    report_elements.append(probability_graph)
 
 if cfg.PDF_report:
+    #adding ROC graph to PDF report if it was created
+    if ROC_exist:
+        report_elements.append(ROC_report)
+
+    #adding peak instensity graph to PDF report if it was created
+    if mod_type == 'flux':
+        report_elements.append(peak_intensities)
+    
+    #adding probability graph to PDF report if it was created
+    if prob_graph:
+        report_elements.append(probability_graph)
+    
+    #building PDF report
     pdf_name = '%s_validation.pdf' %model_name
     report = SimpleDocTemplate(str(val_out / pdf_name), pagesize=letter)
     report.build(report_elements)
     print('PDF report written')
 
+#building JSON report
 if cfg.JSON_report:
     json_name = '%s_validation.json' %model_name
     with open(val_out / json_name, 'w') as jsr:
@@ -1098,7 +1112,7 @@ if cfg.JSON_report:
 
 #%%
 ### GENERATING REFERENCE SHEET ###
-
+#if there isn't already a reference sheet present
 if not (val_out / 'validation_reference.pdf').is_file():
     generate_ref_sheet(val_out)
     print('reference sheet created')
