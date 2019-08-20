@@ -613,7 +613,7 @@ for f in obs_files:
                     if 'false' in all_clear_boolean_model:
                         false_alarms[j] = false_alarms[j]+1
                     else:
-                        false_alarms[j] = false_alarms[j]+1
+                        correct_negatives[j] = correct_negatives[j]+1
                     
                 try:
                     rel_change.append((float(peak_intensity_obs) - float(peak_intensity_model))/float(peak_intensity_obs))
