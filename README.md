@@ -8,7 +8,7 @@ validation_reports/figures folder.
 
 ***NOTE: ValRE was not intended for the creation of model output or observational output. You must already have output present in some directory on your computer in order to run ValRE.
 
-NOTE: IF YOU NEED TO ALTER THE CODE, PLEASE READ ValRE_ADDITIONS.TXT
+ADDITIONALLY: IF YOU NEED TO ALTER THE CODE, PLEASE READ ValRE_ADDITIONS.TXT FIRST
 
 Included With the ValRE Package:
 ================================
@@ -17,7 +17,8 @@ ValRE_ADDITIONS.txt
 ValRE.py  
 config.py  
 operational_sep_quantities.py  
-output_to_json.py  
+output_to_json.py
+gen_output.py
 validation_reports (inner directory - may not be present until first run)  
 validation_reports/figures (inner directory that will house PNG files)  
 GOES_primary_assignments.csv  
@@ -33,19 +34,37 @@ Libraries you will likely have to install:
 pip install wget
 pip install reportlab
 
+The full list of modules that ValRE uses can be found at the beginning of the ValRE.py code.
+
 This program makes use of the software "operational_sep_quantities" created by Katie Whitman, a program
 which has extensive that can be found with the command "pydoc operational_sep_quantities".
 
-The full list of modules that ValRE uses can be found at the beginning of the ValRE.py code.
+There are two other scripts included with the ValRE package, gen_output.py and output_to_json.py, which are scripts that can be used to 
+generate observational output from operational_sep_quantities.py, and each have their own documentation comments within the code.
+
+Assumptions/Simplifications
+===========================
+please be aware of all assumptions and simplifications ValRE makes before running the code so you do not get unclear or incorrect
+output.
+- all output files have some string of the date in them in the forms: YYYY-MM-DD or YYYY_MM_DD
+- model file start and date times are the model's PREDICTION WINDOW. That is, the model is predicting an all clear for that given time 
+  period
+  **note: if model start and end times are the same, that is the same as saying there has not been a prediction
+- all output files are in the JSON form created by the CCMC (this example format can be found in
+  ref_files/example_sepscoreboard_json_file_v20190228.json - however, please do not move/alter this file from its current directory as
+  ValRE or one of the other functions may need to read it in. If you need to use it please just copy it)
+- there is one observation file per event
+- all JSON files present in given output directories (and all subdirectories) are to be used for validation (if there are files you
+  don't want to use for validation, put them in a different folder)
+- when extracting forecast values for peak flux or probability, if a threshold is crossed, ValRE will use the first probability or flux
+  value that crosses the threshold as opposed to the highest value for mean percent error and mean absolute percent error calculations,
+  as well as for plotting purposes. if no threshold is crossed, ValRE will use the highest probability or flux value forecasted for a 
+  given event.
 
 Usage instructions
 ==================
-Note about model output: currently, a date in the format YYYY-MM-DD or YYYY_MM_DD MUST be included in the name of
-each model output file and each observation output file (if you already have observation data). If this
-is a problem, please read ValRE_ADDITIONS.txt.
-
-Once you are sure you have correct model output, open config.py in your python editor of choice -
-Vi, Vim, or Spyder are just a few examples of options if you don't already have one.
+Once you are sure you have correct model output, open config.py in your python editor of choice - Vi, Vim, or Spyder are just a few 
+examples of options if you don't already have one.
 
 In the configuration document, specify:
 1. the directory on your computer containing model output
@@ -96,6 +115,14 @@ use for your given start and end dates. However, if you'd like to specify one in
 you'd like to use for the entire validation, or if you are using instrumental data
 you've created yourself, comment-in the line: "instrument = 'GOES-15'"
 
+FORECAST TIME BEFORE EVENT
+---
+FORMAT: integer  
+EX: 1  
+OTHER NOTES: the amount of days before the event that a model may have predictions for.
+For example, if your model can only predict an event one day before it happens, 
+put in 1. If your model has the potential to predict an event 5 days before it
+happens, put in 5.
 
 START AND END DATES
 ---
@@ -105,11 +132,6 @@ OTHER NOTES: you do not actually have to have model output for your beginning an
 end dates. ValRE will simply extract all model files that are dated within the date
 range that you have specified. If you do not have dates specified in the names
 of your model files, ValRE will NOT be able to function!
-
-DETECT PREVIOUS EVENT
----
-This normally should be False. You may need to change the value to True if you are validating multiple events that happened extremely 
-close to each other and you do not already have observational output for them. This may change in later additions of the code.
 
 THRESHOLDS
 ---
