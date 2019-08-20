@@ -16,9 +16,9 @@ Created on Wed Jul  3 13:37:11 2019
 #of your model files, ValRE will NOT be able to function!
 
 #model output path:
-model_path = '..\SEPSTER_output/'
+model_path = '..\SEPSTER_output'
 #observational output path:
-obs_path = '..\GOES_output/'
+obs_path = '..\GOES_output'
 
 
 ### MODEL NAME ###
@@ -50,21 +50,23 @@ model_name = 'SEPSTER'
 
 #set start date
 start_year = 2010
-start_month = 5
+start_month = 1
 start_day = 1
 
 #set end date
 end_year = 2019
-end_month = 6
-end_day = 2
+end_month = 7
+end_day = 24
 
 
-### DO NOT ALTER THIS UNLESS IF YOU HAVE READ DOCUMENTATION ###
-# should be False
-# you may need to alter this file if you are validating multiple events that happened
-# extremely close to each other
-#more info in the ValRE README document
-detect_previous_event = False
+### FORECAST TIME BEFORE EVENT ###
+#FORMAT: integer
+#EX: 1
+#OTHER NOTES: the amount of days before the event that a model may have predictions for.
+#For example, if your model can only predict an event one day before it happens, 
+#put in one. If your model has the potential to predict an event 5 days before it
+#happens, put in 5.
+days_before_event = 5
 
 
 ### THRESHOLDS ###
@@ -84,8 +86,8 @@ detect_previous_event = False
 energy_threshold = [10,100]
 #threshold(s) (in pfu)
 pfu_threshold = [10,1]
-#probabilisitic threshold (can be just one value for all) ***DECIDE ABT THIS TOO
-prob_threshold = [0.25] #consider this
+#probabilisitic threshold (ONLY ONE VALUE FOR ALL THRESHOLDS)
+prob_threshold = 0.25 #consider this
 
 
 ### REPORTS ###
@@ -112,10 +114,10 @@ JSON_report = True
 #of metric scores.
 
 #hits calculated manually
-man_hits = [5,8]
+man_hits = [0,0]
 #misses calculated manually
-man_misses = [0,6]
+man_misses = [0,0]
 #correct negatives calculated manually
-man_correct_negatives =[3,9]
+man_correct_negatives = [0,0]
 #false alarms calculated manually
-man_false_alarms = [1,1]
+man_false_alarms = [0,0]
