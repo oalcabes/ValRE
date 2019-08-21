@@ -42,7 +42,7 @@ Below find documentation of all of the functions gen_output offers.
 ## gen_subevent_bools(p_10,p1_100)
 ### given lists of peak fluxes for protons >10 MeV and >100 MeV, creates a boolean for whether or not each event is a subevent (doesn't cross a threshold)
 **p_10: *list of floats***  
-  list of peak intensities of protons with >10 MeV
+  list of peak intensities of protons with >10 MeV  
 **p_100: *list of floats***  
   list of peak intensities of protons with >100 MeV  
 
