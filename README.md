@@ -20,6 +20,7 @@ operational_sep_quantities.py
 output_to_json.py  
 gen_output.py  
 validation_reports (inner directory - may not be present until first run)  
+validation_reference.pdf (will be created with first ValRE run, reference sheet for metrics)
 validation_reports/figures (inner directory that will house PNG files)  
 GOES_primary_assignments.csv  
 instrument_dates.csv  
@@ -89,6 +90,9 @@ configuration file, as well as in the "input formats" section below.
 Once you've filled out the configuration file, you can run ValRE from the command line. Once ValRE is finished
 running, you can find your reports in the validation_reports directory, and PNGs of your figures in the figures
 validation_reports/figures directory.
+
+A reference sheet called validation_reference.pdf for how to understand all of the calculated metrics is included with the code, and 
+will be created in the validation_reports directory the first time the code is run.
 
 Input Formats
 =============
