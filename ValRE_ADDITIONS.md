@@ -5,7 +5,7 @@ ValRE EDITS
 THIS DOCUMENT HAS NOTES FOR ANYONE WHO MAY HAVE TO ALTER THE ValRE CODE. READ BELOW IF ValRE
 IS NOT WORKING CORRECTLY AND YOU NEED TO EDIT IT.
 
-what my code does:
+what ValRE does:
 - reads in names of all available model output files
 - extracts files between given start and end dates
 - extracts values from model output for each date
