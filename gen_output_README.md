@@ -5,19 +5,17 @@ Below find documentation of all of the functions gen_output offers.
 
 ## obs_csv2json(input_file,output_file,example_path,instrument)
 ### a function converting csv output files from operational_sep_quantities to json files for observations
-**input_file: *str***  
-  csv filename (must end in .csv)
+  **input_file: *str***  
+  csv filename (must end in .csv)  
 **output_file: *str***  
-  json filename (must end in .json)
+  json filename (must end in .json)  
 **example_path: *str***  
-  path where template json file can be found
+  path where template json file can be found  
 **instrument: *str***  
-  name of the instrument used for observation
+  name of the instrument used for observation  
   
 ## choose_inst(given_start_date,given_end_date)
-### choose the correct instrument to use for observations for a given date range. Used if there is no information about which
-    instrument was primary.
-    
+### choose the correct instrument to use for observations for a given date range. Used if there is no information about which instrument was primary.
 **given_start_date**
 **given_end_date**
 
