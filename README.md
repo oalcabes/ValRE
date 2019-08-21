@@ -17,8 +17,8 @@ ValRE_ADDITIONS.txt
 ValRE.py  
 config.py  
 operational_sep_quantities.py  
-output_to_json.py
-gen_output.py
+output_to_json.py  
+gen_output.py  
 validation_reports (inner directory - may not be present until first run)  
 validation_reports/figures (inner directory that will house PNG files)  
 GOES_primary_assignments.csv  
@@ -60,6 +60,8 @@ output.
   value that crosses the threshold as opposed to the highest value for mean percent error and mean absolute percent error calculations,
   as well as for plotting purposes. if no threshold is crossed, ValRE will use the highest probability or flux value forecasted for a 
   given event.
+- ValRE will only use flux and probability thresholds given in the configuration file. If your model output has a different threshold   
+  than that given in the configuration file, ValRE will not read it or use it. 
 
 Usage instructions
 ==================
