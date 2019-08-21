@@ -19,7 +19,7 @@ import numpy as np
 import csv
 import json as js
 import os.path
-import argparser
+import argparse
 
 #%%
 
@@ -128,14 +128,10 @@ def obs_csv2json(input_file,output_file,example_path,instrument):
         event['fluence'][0]['fluence']=data[i]['fluence>10']
         event['fluence'][1]['fluence']=data[i]['fluence>100']
 
-        #thresholds (using default)
-        if int(event['energy_min']) == 10:
-            event['threshold'] = 10
-        elif int(event['energy_min']) == 100:
-            event['threshold'] = 1
-        
-        #calculating all clear based on whether peak intensity crosses threshold
-        if float(event['peak_intensity']) >= event['threshold']:
+        #flux threshold
+        event['threshold'] = data[i]['flux_threshold']
+
+        if float(event['peak_intensity']) >= cfg.pfu_threshold[cfg.energy_threshold.index(int(event['energy_min']))]:
             event['all_clear_boolean'] = 'false'
 
         else:
@@ -405,7 +401,7 @@ def gen_subevent_bools(p_10,p_100):
     given lists of peak fluxes for protons >10 MeV and >100 MeV, creates a boolean
     for whether or not each event is a subevent (doesn't cross a threshold)
     """
-    subevent_bools = [None]*len(p_10)
+    subevent_bools = []
     
     for j in range(len(p_10)):
         try:
@@ -437,21 +433,26 @@ def gen_subevent_bools(p_10,p_100):
         else:
             subevent_bools.append(True)
             
-        return(subevent_bools)
+    return(subevent_bools)
         
 def multi_events(start_time,end_time,subevent_bools):
     """
-    takes in lists of start times, end times, and whether or not an event is a subevent,
-    and uses those lists to run functions that subsequently extract data from the GOES
-    database
+    takes in lists of start times, end times, and a list of whether or not an event is a
+    subevent, and uses those lists to run functions that subsequently extract data from
+    the GOES database. Each list must have the same length, and indices of lists must
+    correspond (ie start_time[j] has an end time of end_time[j] and its subevent boolean
+    is subevent_bools[j])
     """
     
+    #running through for each event
     for j in range(len(start_time)):
-
+        
+        #start, end, and subevent bool for this event
         st = start_time[j]
         et = end_time[j]
-        subevent = subevent_bools[j]
+        subevent = bool(subevent_bools[j])
         
+        #checking if start time is actually available
         if str(st) != 'nan':
             try:
                 st = parse(st)
@@ -461,6 +462,7 @@ def multi_events(start_time,end_time,subevent_bools):
         else:
             yes_st = False
         
+        #checking if end time is actually available
         if str(et) != 'nan':
             try:
                 et = parse(et)
@@ -470,11 +472,17 @@ def multi_events(start_time,end_time,subevent_bools):
         else:
             yes_et = False
     
+        #if both start and end times are available, running the code
         if yes_st and yes_et:
+            #event must be after Nov. 2010 because currently no capability for
+            #instruments in use before then
             if st > datetime(2010,9,1):
                 try:
-                    print('got start and end times! running Katies code')  
+                    print('got start and end times! running database extraction')  
                     database_extraction(st,et,instrument_chosen,subevent)
                 except:
                     continue
+            else:
+                print('cannot run for events before November 2010 because do not have '
+                      'access to instruments before then')
         
