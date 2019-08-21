@@ -73,9 +73,3 @@ alter the way gen_ouput.py incorporates the code accordingly.
     in all of the values from the csv files and reformats them into the JSON format given by the CCMC. If the output of 
     operational_sep_quantities.py changes or has problems, these observational JSON files may be created incorrectly. Therefore, it may 
     be necessary to edit the obs_csv2json function directly to make sure all of the values are correctly loaded into JSON.
-  
-  
- some ideas for new things I could do with ValRE
- ===============================================
- - make it possible to add to a previous validation report by adding all the hits and misses from a previous report to a new one
- - add a skip dates option
