@@ -168,3 +168,10 @@ energy_threshold determined in the thresholds category above, and each value is 
 false alarms for the corresponding energy_threshold that has been calculated manually. These values can be added to if there are 
 particular events that ValRE is not able to use model and/or observational output to calculate, but you would still like to be included 
 for calculations of metric scores.
+
+NO MODEL FILE
+---
+FORMAT: string  
+OPTIONS: 'all_clear' or 'nothing'  
+OTHER NOTES: if no_mod_file = 'all_clear', not having model files for a given event will be read as equivalent to a forecast all clear.
+If no_mod_file = 'nothing', ValRE will skip all observation files that don't have corresponding model files.
