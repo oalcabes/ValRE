@@ -43,10 +43,10 @@ def obs_csv2json(input_file,output_file,example_path,instrument):
     """
 
     obs_path = Path(cfg.obs_path)
-
+    
     with open(example_path,'r') as e:
         example = js.load(e)
-
+    
     #deleting unused categories
     del(example['sep_forecast_submission']['forecasts'])
     del(example['sep_forecast_submission']['triggers'][2])
@@ -59,15 +59,6 @@ def obs_csv2json(input_file,output_file,example_path,instrument):
     del(example['sep_forecast_submission']['issue_time'])
     
     example['sep_forecast_submission']['mode'] = 'observation'
-
-    #creating fluence report
-    fluence = []
-    fluence.append({'energy_min' : '10','fluence_value' : 'fluence_value', 'units' : 'MeV [cm^-2]'})
-    fluence.append({'energy_min' : '100', 'fluence_value' : 'fluence_value', 'units' : 'MeV [cm^-2]'})
-
-    #creating format for ongoing events
-    ongoing_events = { "start_time": "2017-09-10T19:30Z", "threshold": 10,
-                       "energy_min": 10, "energy_max": -1 }
 
     #json template for observations
     obs_json = example
@@ -88,48 +79,44 @@ def obs_csv2json(input_file,output_file,example_path,instrument):
              ['observatory']) = instrument
 
     #creating data for all energy levels forecast
-    for i in range(1,len(obs_data)):
-        data[i-1]=obs_data[i]
+    for j in range(1,len(obs_data)):
+        data[j-1]=obs_data[j]
 
     #recording start and end times for all events
-    for j in range(0,len(data)):
-        data[j]['start_time'] = datetime.strptime(data[j]['start_time'],'%Y-%m-%d %H:%M:%S')
-        data[j]['start_time'] = data[j]['start_time'].isoformat()
-        data[j]['end_time'] = datetime.strptime(data[j]['end_time'],'%Y-%m-%d %H:%M:%S')
-        data[j]['end_time'] = data[j]['end_time'].isoformat()
-        data[j]['peak_time'] = datetime.strptime(data[j]['peak_time'],'%Y-%m-%d %H:%M:%S')
-        data[j]['peak_time'] = data[j]['peak_time'].isoformat()
-
-    #recording observed values for all events
     for i in range(len(data)):
-        
-        
+        data[i]['start_time'] = datetime.strptime(data[i]['start_time'],'%Y-%m-%d %H:%M:%S')
+        data[i]['start_time'] = data[i]['start_time'].isoformat()
+        data[i]['end_time'] = datetime.strptime(data[i]['end_time'],'%Y-%m-%d %H:%M:%S')
+        data[i]['end_time'] = data[i]['end_time'].isoformat()
+        data[i]['peak_time'] = datetime.strptime(data[i]['peak_time'],'%Y-%m-%d %H:%M:%S')
+        data[i]['peak_time'] = data[i]['peak_time'].isoformat()
+    
+        #recording observed values for all events
         if i > 0:
-         (obs_json['sep_forecast_submission']['triggers'][0]['particle_intensity']
-                  ['ongoing_events']).append(ongoing_events)
+            (obs_json['sep_forecast_submission']['triggers'][0]['particle_intensity']
+                     ['ongoing_events']).append({})
 
         event = (obs_json['sep_forecast_submission']['triggers'][0]['particle_intensity']
-                         ['ongoing_events'][i])
-        
-        #energy channe;
-        event['energy_min'] = float(data[i]['energy_threshold'][1:])
+                     ['ongoing_events'][i])
         
         #start and end times
         event['start_time']=data[i]['start_time']
+        event['threshold'] = data[i]['flux_threshold']
+        event['energy_min'] = float(data[i]['energy_threshold'][1:])
+        event['energy_max'] = -1
         event['end_time']=data[i]['end_time']
 
         #peak values
         event['peak_intensity']=data[i]['intensity']
         event['peak_time'] = data[i]['peak_time']
         event['intensity_units']='pfu'
-        
+            
         #fluence values
-        event['fluence'] = fluence
+        event['fluence'] = [{'energy_min' : '10','fluence_value' : 'fluence_value', 'units' : 'MeV [cm^-2]'},
+                            {'energy_min' : '100', 'fluence_value' : 'fluence_value', 'units' : 'MeV [cm^-2]'}]
         event['fluence'][0]['fluence']=data[i]['fluence>10']
         event['fluence'][1]['fluence']=data[i]['fluence>100']
 
-        #flux threshold
-        event['threshold'] = data[i]['flux_threshold']
 
         if float(event['peak_intensity']) >= cfg.pfu_threshold[cfg.energy_threshold.index(int(event['energy_min']))]:
             event['all_clear_boolean'] = 'false'
@@ -137,10 +124,11 @@ def obs_csv2json(input_file,output_file,example_path,instrument):
         else:
             event['all_clear_boolean'] = 'true'
 
+
     #building json file
     with open(obs_path / output_file, 'w') as s:
-       js.dump(obs_json,s,indent=1)
-       print('json file created')
+        js.dump(obs_json,s,indent=1)
+        print('json file created')
      
     return
 
@@ -380,7 +368,7 @@ def database_extraction(mod_start_time,mod_end_time,instrument_chosen,subevent_b
                 
                 #json name
                 obs_name = (str(instrument) + '_' +
-                            str(mod_start_time.date()) + '.json')
+                            str(day) + '.json')
                 #creating json file
                 obs_csv2json((katies_path / new_obs_name), obs_name,
                              (ref_path/'example_sepscoreboard_json_file_v20190228.json'),
