@@ -753,7 +753,6 @@ for j in range(num_thresholds):
     if t == 0:
         print('no data for this threshold, no metric scores calculated' )
         threshold_avail = False
-        break
     else:
         threshold_avail = True
 
@@ -941,9 +940,9 @@ for j in range(num_thresholds):
 
             #metric skills
             json_report['thresholds'][j]['metric_scores'] = metrics_dict
-
     #deleting subplots on graphs if model didn't have forecasts for this threshold
     else:
+        print('deleting unused axes of graphs')
         if mod_type == 'prob':
             prob_fig.delaxes(prob_axes[j])
             prob_axes = prob_fig.axes
