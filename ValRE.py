@@ -698,6 +698,16 @@ for f in obs_files:
                                            float(peak_intensity_obs),xdate=True,
                                            ydate=False,marker='o',c='blue',
                                            label='observation')
+            else:
+                if cfg.no_mod_file == 'all_clear':
+                    all_clear_boolean_model = 'true'
+                    print('creating value for contingency table')
+                    if str(all_clear_boolean_obs).lower() == 'false':
+                        misses[j] = misses[j] + 1
+                    elif str(all_clear_boolean_obs).lower() == 'true':
+                        correct_negatives[j] = correct_negatives[j]+1    
+                else:
+                    print('no model record found - skipping')
         else:
             print('energy channel not chosen for validation - skipping')
     

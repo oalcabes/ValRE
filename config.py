@@ -66,7 +66,7 @@ end_day = 24
 #For example, if your model can only predict an event one day before it happens, 
 #put in one. If your model has the potential to predict an event 5 days before it
 #happens, put in 5.
-days_before_event = 5
+days_before_event = 1
 
 
 ### THRESHOLDS ###
@@ -121,3 +121,11 @@ man_misses = [0,0]
 man_correct_negatives = [0,0]
 #false alarms calculated manually
 man_false_alarms = [0,0]
+
+### NO MODEL FILE ###
+#FORMAT: string
+#OPTIONS: 'all_clear' or 'nothing'
+#OTHER NOTES: if no_mode_file = 'all_clear', not having model files for a given event
+#will be read as equivalent to a forecast all clear. If no_mod_file = 'nothing',
+#ValRE will skip all observation files that don't have corresponding model files. 
+no_mod_file = 'all_clear'
