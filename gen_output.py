@@ -291,7 +291,7 @@ def choose_prime_inst(given_start_date,given_end_date):
 
     return([instrument,end_date])
 
-def database_extraction(mod_start_time,mod_end_time,instrument_chosen,subevent_bool):
+def database_extraction(mod_start_time,mod_end_time,instrument_chosen,subevent_bool,detect_previous_event = False):
     """
     a function that creates observational json output files given start and end dates
     by extracting data from the iswep GOES database. Only works with GOES instruments.
@@ -377,12 +377,43 @@ def database_extraction(mod_start_time,mod_end_time,instrument_chosen,subevent_b
                 print('obs file created')
                 #file is created - will not run for anymore dates within window
                 obs_file_created = True
-                break
+                
+                return(obs_name)
             else:
                 print('no csv file found with this date, checking next one')
         #if the json file has been created, not running for anymore dates
-        else:
-            break
+        #else:
+            #break
+        
+def multi_event(st,et,instrument_chosen,subevent):
+    """
+    used if there is more than one event occurring within a short time period. will
+    generate an output file for every event that occurs within a given time window -
+    not to be confused with many_events, which generates output given multiple time
+    windows.
+    """
+    
+    out_name_1 = Path(cfg.obs_path) / database_extraction(st,et,instrument_chosen,subevent)
+
+    with open(out_name_1, 'r') as o:
+        out = js.load(o)
+    
+    end_times = []
+    start_times=[]
+
+    ongoing_events = out['sep_forecast_submission']['triggers'][0]['particle_intensity']['ongoing_events']
+
+    for i in range(len(ongoing_events)):
+        start_times.append(parse(ongoing_events[i]['start_time']))
+        end_times.append(parse(ongoing_events[i]['end_time']))
+    
+    last_end = max(end_times)
+
+    if last_end < et:
+        st = last_end + timedelta(days=2)
+        database_extraction(st,et,instrument_chosen,subevent,detect_previous_event=True)
+    
+    return
         
 def gen_subevent_bools(p_10,p_100):
     """
@@ -423,13 +454,15 @@ def gen_subevent_bools(p_10,p_100):
             
     return(subevent_bools)
         
-def multi_events(start_time,end_time,subevent_bools):
+def many_events(start_time,end_time,subevent_bools):
     """
-    takes in lists of start times, end times, and a list of whether or not an event is a
-    subevent, and uses those lists to run functions that subsequently extract data from
-    the GOES database. Each list must have the same length, and indices of lists must
-    correspond (ie start_time[j] has an end time of end_time[j] and its subevent boolean
-    is subevent_bools[j])
+    takes in lists of start times and end times to create a list of time windows,
+    and a list of whether or not an event is a subevent, and uses those lists to run
+    functions that extract data from the GOES database. Each list must have
+    the same length, and indices of lists must correspond (ie start_time[j] has an end
+    time of end_time[j] and its subevent boolean is subevent_bools[j]). not to be
+    confused with multi_events, which generates output given multiple events within one
+    time window.
     """
     
     #running through for each event
