@@ -10,7 +10,7 @@ what ValRE does:
 - extracts files between given start and end dates
 - extracts values from each observation file and determines observed all clear value
 - looks through all model files and extracts any files that correspond to this observed event
-- determines forecast all clear based on if any of the model files say all clear is false
+- determines forecast all clear based on if any of the corresponding model files say a threshold will be crossed
 - compares observed and forecasted all clear to generate metrics
 - uses other values (ex. peak intensity, forecast probabilities, etc.) to create verification graphs
 - prints reports in PDF and/or JSON formats
@@ -55,15 +55,9 @@ likely occur in the following if statement in the main code:
                         print('model file recorded event')
           
           
-Likely Problems with Other Scripts
-===================================
-1. DETECT PREVIOUS EVENT VALUE: This is an input value for the operational_sep_quantities.py module. For most ValRE purposes, the detect
-previous event value can be set to false, as most events that ValRE uses do not occur right after each other. However, for such an
-event, if it is necessary to go into the GOES database to retrieve observational data, it may be necessary to change the detect previous
-event value to True. ValRE does not currently have a way to automate this, and it may be necessary to validate that particular event
-manually. If you need to add in an automation, you can edit the function database_extraction in gen_output.py and change the input in 
-the function sep.run_all from cfg.detect_previous_event to your own value.
-2. UPDATES TO operational_sep_quantities.py: If there is a new version of operational_sep_quantities.py, you can replace the old copy of
+Likely Problems with gen_output Module
+======================================
+1. UPDATES TO operational_sep_quantities.py: If there is a new version of operational_sep_quantities.py, you can replace the old copy of
 the file in the ValRE folder with the new copy. However, if the inputs or outputs to the function have changed, it may be necessary to
 alter the way gen_ouput.py incorporates the code accordingly.
     a. CHANGES TO INPUT: Most alterations to the input can be made in the database_extraction function in the gen_output.py code, before
@@ -73,3 +67,9 @@ alter the way gen_ouput.py incorporates the code accordingly.
     in all of the values from the csv files and reformats them into the JSON format given by the CCMC. If the output of 
     operational_sep_quantities.py changes or has problems, these observational JSON files may be created incorrectly. Therefore, it may 
     be necessary to edit the obs_csv2json function directly to make sure all of the values are correctly loaded into JSON.
+2. DETECT PREVIOUS EVENT VALUE: This is an input value for the operational_sep_quantities.py module. For most ValRE purposes, the detect
+previous event value can be set to false, as most events that ValRE uses do not occur right after each other. However, for such an
+event, if it is necessary to go into the GOES database to retrieve observational data, it may be necessary to change the detect previous
+event value to True. ValRE does not currently have a way to automate this, and it may be necessary to validate that particular event
+manually. If you need to add in an automation, you can edit the function database_extraction in gen_output.py and change the input in 
+the function sep.run_all from cfg.detect_previous_event to your own value.
