@@ -390,28 +390,51 @@ def multi_event(st,et,instrument_chosen,subevent):
     used if there is more than one event occurring within a short time period. will
     generate an output file for every event that occurs within a given time window -
     not to be confused with many_events, which generates output given multiple time
-    windows.
+    windows. Can create files for up to 3 events within specified time window.
     """
+    print('checking for multiple events within given time window')
     
     out_name_1 = Path(cfg.obs_path) / database_extraction(st,et,instrument_chosen,subevent)
 
     with open(out_name_1, 'r') as o:
-        out = js.load(o)
+        out1 = js.load(o)
     
-    end_times = []
-    start_times=[]
+    end_times1 = []
+    start_times1 = []
+ 
+    ongoing_events1 = (out1['sep_forecast_submission']['triggers'][0]['particle_intensity']
+                          ['ongoing_events'])
 
-    ongoing_events = out['sep_forecast_submission']['triggers'][0]['particle_intensity']['ongoing_events']
-
-    for i in range(len(ongoing_events)):
-        start_times.append(parse(ongoing_events[i]['start_time']))
-        end_times.append(parse(ongoing_events[i]['end_time']))
+    for i in range(len(ongoing_events1)):
+        start_times1.append(parse(ongoing_events1[i]['start_time']))
+        end_times1.append(parse(ongoing_events1[i]['end_time']))
     
-    last_end = max(end_times)
+    last_end1 = max(end_times1)
 
-    if last_end < et:
-        st = last_end + timedelta(days=2)
-        database_extraction(st,et,instrument_chosen,subevent,detect_previous_event=True)
+    if last_end1.date() < et.date():
+        print('extracting second event')
+        st = last_end1 + timedelta(days=2)
+        out_name_2 = Path(cfg.obs_path) / database_extraction(st,et,instrument_chosen,subevent,detect_previous_event=True)
+    
+    with open(out_name_2, 'r') as o2:
+        out2 = js.load(o2)
+        
+    end_times2 = []
+    start_times2 = []
+    
+    ongoing_events2 = (out2['sep_forecast_submission']['triggers'][0]['particle_intensity']
+                           ['ongoing_events'])
+
+    for i in range(len(ongoing_events2)):
+        start_times2.append(parse(ongoing_events2[i]['start_time']))
+        end_times2.append(parse(ongoing_events2[i]['end_time']))
+    
+    last_end2 = max(end_times2)
+
+    if last_end2.date() < et.date():
+        print('extracting second event')
+        st = last_end2 + timedelta(days=2)
+        out_name_2 = Path(cfg.obs_path) / database_extraction(st,et,instrument_chosen,subevent,detect_previous_event=True)
     
     return
         
