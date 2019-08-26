@@ -5,15 +5,13 @@ Created on Wed Jul  3 13:37:11 2019
 @author: oalcabes
 """
 
-#CONFIG FILE - FOR WHEN MODEL OUTPUT HAS ALREADY BEEN CREATED
-
 ### PATHFILES ###
 #FORMAT: output directories in the form of a string
 #EX. '.\Mag4_output'
 #OTHER NOTES: Write the directory however you would on your own computer.
 #The current working directory is the directory you have placed the ValRE package in.
-#If you do not have dates specified in the names
-#of your model files, ValRE will NOT be able to function!
+#If you do not have dates specified in the names of your model files, ValRE will NOT be
+#able to function!
 
 #model output path:
 model_path = '..\SEPSTER_output'
@@ -33,10 +31,9 @@ model_name = 'SEPSTER'
 #FORMAT: string
 #EX: 'GOES-08'
 #OPTIONS: GOES-08, -10, -11, -12, -13, -14 -15, SEPEM
-#OTHER NOTES: ValRE automatically chooses the correct GOES observational instrument to
-#use for your given start and end dates. However, if you'd like to specify one instrument
-#you'd like to use for the entire validation, or if you are using instrumental data
-#you've created yourself, comment-in the line below:
+#OTHER NOTES: ValRE automatically reads in the instrument(s) used in your observation
+#files. However, if you'd like to manually specify the instrument(s)
+#used for validation, comment-in the line below:
 #instrument = 'GOES-15'
 
 
@@ -65,7 +62,8 @@ end_day = 24
 #OTHER NOTES: the amount of days before the event that a model may have predictions for.
 #For example, if your model can only predict an event one day before it happens, 
 #put in one. If your model has the potential to predict an event 5 days before it
-#happens, put in 5.
+#happens, put in 5. If your model can only predict hours before, this parameter should be
+#equal to 1.
 days_before_event = 1
 
 
