@@ -6,11 +6,11 @@ THIS DOCUMENT HAS NOTES FOR ANYONE WHO MAY HAVE TO ALTER THE ValRE CODE. READ BE
 IS NOT WORKING CORRECTLY AND YOU NEED TO EDIT IT.
 
 what ValRE does:
-- reads in names of all available model output files
+- reads in names of all available observation output files
 - extracts files between given start and end dates
-- extracts values from model output for each date
-- checks if there's observational output for each model date, and if there isn't goes into the GOES database and extracts it
-- extracts corresponding values from observational output for each given model output
+- extracts values from each observation file and determines observed all clear value
+- looks through all model files and extracts any files that correspond to this observed event
+- determines forecast all clear based on if any of the model files say all clear is false
 - compares observed and forecasted all clear to generate metrics
 - uses other values (ex. peak intensity, forecast probabilities, etc.) to create verification graphs
 - prints reports in PDF and/or JSON formats
