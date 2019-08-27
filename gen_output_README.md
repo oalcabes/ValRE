@@ -5,6 +5,7 @@ Below find documentation of all of the functions gen_output offers.
 
 ## obs_csv2json(input_file,output_file,example_path,instrument)
 ### a function converting csv output files from operational_sep_quantities to json files for observations
+**PARAMETERS**
 **input_file: *str***  
   csv filename (must end in .csv)  
 **output_file: *str***  
@@ -16,11 +17,13 @@ Below find documentation of all of the functions gen_output offers.
   
 ## choose_inst(given_start_date,given_end_date)
 ### choose the correct instrument to use for observations for a given date range. Used if there is no information about which instrument was primary.
-### returns: list containing string of instrument name and datetime object of final date that instrument is available
+**PARAMETERS**  
 **given_start_date: *date object***  
   start date of event  
 **given_end_date: *date object***  
   end date of event  
+**RETURNS**  
+  list containing string of instrument name and datetime object of final date that instrument is available  
   
 ## choose_prime_inst(given_start_date,given_end_date)
 ### choose the correct instrument to use for observations for a given date range based on the primary instrument for that time period. inputs must be date objects from the datetime module.
