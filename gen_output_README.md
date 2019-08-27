@@ -59,7 +59,7 @@ Below find documentation of all of the functions gen_output offers.
   boolean of whether or not to run operational_sep_quantities for multiple thresholds or operational_sep_quantities_one for one       \
   threshold. Default is False.  
   
-**RETURNS**
+**RETURNS**  
   name of json file created (string)
   
 ## two_in_one(obs_file,et,subevent)
@@ -95,7 +95,7 @@ Below find documentation of all of the functions gen_output offers.
 **p_100: *list of floats***  
   list of peak intensities of protons with >100 MeV  
   
-**RETURNS**
+**RETURNS**  
   list of booleans for whether or not an event was a subevent
 
 ## many_events(start_time,end_time,subevent_bools)
