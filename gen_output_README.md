@@ -47,15 +47,15 @@ Below find documentation of all of the functions gen_output offers.
 **instrument_chosen: *boolean***  
   boolean of whether or not an instrument has been selected for this event yet. True if an instrument has been selected, False if not.  
 **subevent_bool: *boolean***  
-  boolean of whether or not the event is a subevent, ie, has crossed the thresholds of >10 MeV >10 pfu or >100 MeV >1 pfu.  
-**detect_previous_event: *boolean***
+  boolean of whether or not the event is a subevent, ie, has crossed the thresholds of >10 MeV >10 pfu or >100 MeV >1 pfu.    
+**detect_previous_event: *boolean***  
   boolean of whether or not to detect if an event is already happening; that is, if the flux is already above threshold at the beginning
   of the given time window. Default is False. Should only be set to true when running for multiple events that are close to each other,
-  likely using the two_in_one or multi_event functions.
-**thresholds: *string***
+  likely using the two_in_one or multi_event functions.  
+**thresholds: *string***  
   string of which threshold to run operational_sep_quantities or operational_sep_quantities_one for. More details found in 
-  operational_sep_quantities documentation. Default is '100,1'.
-**one_thresh: *boolean***
+  operational_sep_quantities documentation. Default is '100,1'.  
+**one_thresh: *boolean***  
   boolean of whether or not to run operational_sep_quantities for multiple thresholds or operational_sep_quantities_one for one       \
   threshold. Default is False.  
   
