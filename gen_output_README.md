@@ -63,7 +63,7 @@ Below find documentation of all of the functions gen_output offers.
   name of json file created (string)
   
 ## two_in_one(obs_file,et,subevent)
-### two events in one time window
+### will create JSON output files if there are two events (for each threshold) in one time window. Ie, if there are two >10MeV >10pfu events as well as two >100MeV >1pfu events, will create files for all four events, but if there are three >100MeV >1pfu events, will only generate JSON files for the first two. Second events have different thresholds in different files as opposed to together.
 **PARAMETERS**
 **obs_file: *path object***  
   an observational file that may not contain all of the events that ocurred within its given time window  
@@ -76,7 +76,7 @@ Below find documentation of all of the functions gen_output offers.
   list of names of all files created (strings)
   
 ## multi_event(st,et,instrument_chosen,subevent)
-### all events in one time window (not just two). Used if there is more than one event occurring within a short time period. will generate an output file for every event that occurs within a given time window - not to be confused with many_events, which generates output given multiple time windows. Can create files for up to 3 events within specified time window.
+### will create JSON output files for up to 3 events in one time window for a given energy threshold. Will generate an output file for every event that occurs within a given time window, and any secondary events will generate output files for individual thresholds separately. Not to be confused with many_events, which generates output given multiple time windows. Can create files for up to 3 events within specified time window.
 **PARAMETERS**  
 **st: *datetime object***  
   start time of an event window  
