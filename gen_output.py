@@ -9,6 +9,7 @@ Created on Thu Aug 15 11:45:12 2019
 
 from datetime import timedelta, datetime
 import operational_sep_quantities as sep
+import operational_sep_quantities_one as one_sep
 from importlib import reload
 from dateutil.parser import parse
 from urllib import request
@@ -112,8 +113,10 @@ def obs_csv2json(input_file,output_file,example_path,instrument):
         event['intensity_units']='pfu'
             
         #fluence values
-        event['fluence'] = [{'energy_min' : '10','fluence_value' : 'fluence_value', 'units' : 'MeV [cm^-2]'},
-                            {'energy_min' : '100', 'fluence_value' : 'fluence_value', 'units' : 'MeV [cm^-2]'}]
+        event['fluence'] = [{'energy_min' : '10','fluence_value' : 'fluence_value',
+                             'units' : 'MeV [cm^-2]'},
+                            {'energy_min' : '100', 'fluence_value' : 'fluence_value',
+                             'units' : 'MeV [cm^-2]'}]
         event['fluence'][0]['fluence']=data[i]['fluence>10']
         event['fluence'][1]['fluence']=data[i]['fluence>100']
 
@@ -128,7 +131,7 @@ def obs_csv2json(input_file,output_file,example_path,instrument):
     #building json file
     with open(obs_path / output_file, 'w') as s:
         js.dump(obs_json,s,indent=1)
-        print('json file created')
+        print('json file %s created' %output_file)
      
     return
 
@@ -291,7 +294,11 @@ def choose_prime_inst(given_start_date,given_end_date):
 
     return([instrument,end_date])
 
-def database_extraction(mod_start_time,mod_end_time,instrument_chosen,subevent_bool,detect_previous_event = False):
+def database_extraction(mod_start_time,mod_end_time,instrument_chosen,subevent_bool,
+                        detect_previous_event = False,thresholds='100,1',one_thresh = False):
+    
+    #NOTE: NEED TO FIX THRESHOLDS STUFF WITH THIS RN
+    
     """
     a function that creates observational json output files given start and end dates
     by extracting data from the iswep GOES database. Only works with GOES instruments.
@@ -299,20 +306,20 @@ def database_extraction(mod_start_time,mod_end_time,instrument_chosen,subevent_b
     obs_file_created = False
 
     #extending time window
-    window_end_date = (mod_end_time.date() + timedelta(days=2))
-    window_start_date = (mod_start_time.date() - timedelta(days=2))
+    window_end_time = (mod_end_time + timedelta(days=2))
+    window_start_time = (mod_start_time - timedelta(days=2))
     
     #making a list of all dates within window
     day_list=[]
     for d in range(10):
-        day_list.append(window_start_date + timedelta(days=d))
+        day_list.append((window_start_time + timedelta(days=d)).date())
     print('day list = %s' %day_list)
     
     print('determining if an instrument has been chosen')
 
     if instrument_chosen:
         #if an instrument has been chosen, checking to make sure it still works for this date
-        if inst_end < window_end_date:
+        if inst_end < window_end_time:
             instrument_chosen = False
     else:
         #if insturment hasn't been chosen, figuring out what it should be for given date
@@ -325,8 +332,8 @@ def database_extraction(mod_start_time,mod_end_time,instrument_chosen,subevent_b
 
         except:
             #choosing instrument using function if not given in cfg
-            instrument_stuff = choose_prime_inst(window_start_date,
-                                                 window_end_date)
+            instrument_stuff = choose_prime_inst(window_start_time.date(),
+                                                 window_end_time.date())
             instrument = instrument_stuff[0]
             #figuring out how long we can use this instrument
             inst_end = instrument_stuff[1]
@@ -334,18 +341,25 @@ def database_extraction(mod_start_time,mod_end_time,instrument_chosen,subevent_b
     
     #running katie's code to extract data using chosen instrument and dates
     print('extracting data from GOES website')
-    if subevent_bool:
-        #if event is a subevent, changing the threshold in katie's code to
-        #10 MeV > 1pfu so that it will be recorded
-        print('********************SUBEVENT**************************')
-        sep.run_all(str(window_start_date), str(window_end_date), str(instrument),
-                    'integral', '', '', False, detect_previous_event, '10,1')
-        print('ran for subevent')
+    
+    if one_thresh:
+        one_sep.run_all(str(window_start_time), str(window_end_time), str(instrument),
+                        'integral', '', '', True, detect_previous_event, thresholds)    
+        print('ran for threshold %s' %thresholds)
     else:
-        #if an event, running with usual thresholds
-        print('********************EVENT*****************************')
-        sep.run_all(str(window_start_date), str(window_end_date),str(instrument), 
-                    'integral', '', '', False, detect_previous_event, '100,1')
+        if subevent_bool:
+            thresholds = '10,1'
+            #if event is a subevent, changing the threshold in katie's code to
+            #10 MeV > 1pfu so that it will be recorded
+            print('********************SUBEVENT**************************')
+            sep.run_all(str(window_start_time), str(window_end_time), str(instrument),
+                        'integral', '', '', True, detect_previous_event, thresholds)
+            print('ran for subevent')
+        else:
+            #if an event, running with usual thresholds
+            print('********************EVENT*****************************')
+            sep.run_all(str(window_start_time), str(window_end_time),str(instrument), 
+                        'integral', '', '', True, detect_previous_event, thresholds)
         
     #reloading function so it doesn't keep old data    
     reload(sep)
@@ -356,10 +370,16 @@ def database_extraction(mod_start_time,mod_end_time,instrument_chosen,subevent_b
         if not obs_file_created:
             #checking each day within the window to find the csv file if it hasn't
             #already been found
-            
-            #getting what the csv file name would be for this date
-            new_obs_name = ('sep_values_' + str(instrument) + '_integral_' +
-                            day.strftime('%Y_%m_%d').replace('_0','_') + '.csv')
+            print('thresholds: %s' %thresholds)
+               
+            if one_thresh:
+                new_obs_name = ('sep_values_' + str(instrument) + '_integral_gt' +
+                                str(thresholds).split(',')[0] + '_' + str(thresholds).split(',')[1] + 'pfu_' +
+                                day.strftime('%Y_%m_%d').replace('_0','_') + '.csv')
+            else:
+                new_obs_name = ('sep_values_' + str(instrument) + '_integral_' +
+                                day.strftime('%Y_%m_%d').replace('_0','_') + '.csv')
+                
             print('new_os_name %s' %new_obs_name)        
             
             #checking if that file exists
@@ -367,8 +387,11 @@ def database_extraction(mod_start_time,mod_end_time,instrument_chosen,subevent_b
                 #if a file with this date exists, creating the corresponding json file
                 
                 #json name
-                obs_name = (str(instrument) + '_' +
-                            str(day) + '.json')
+                if one_thresh:
+                    obs_name = (str(instrument) + '_' + str(day) + 'only_' + str(thresholds).split(',')[0] + 'MeV_event.json')
+                else:
+                    obs_name = (str(instrument) + '_' +
+                                str(day) + '.json')
                 #creating json file
                 obs_csv2json((katies_path / new_obs_name), obs_name,
                              (ref_path/'example_sepscoreboard_json_file_v20190228.json'),
@@ -384,9 +407,77 @@ def database_extraction(mod_start_time,mod_end_time,instrument_chosen,subevent_b
         #if the json file has been created, not running for anymore dates
         #else:
             #break
+            
+        
+def two_in_one(obs_file,et,subevent):
+    """
+    will create JSON output files if there are two events (for each threshold) in one
+    time window. Ie, if there are two >10MeV >10pfu events as well as two >100MeV >1pfu
+    events, will create files for all four events, but if there are three >100MeV >1pfu
+    events, will only generate JSON files for the first two. Second events have different
+    thresholds in different files as opposed to together.
+    """
+    
+    #in this function, the "original time window" talked about in the comments
+    #refers to the start and end times that were input to create the file obs_file,
+    #which will likely have been created using the database_extraction function
+    
+    #opening first output file created by operational_sep_quantities
+    with open(obs_file, 'r') as o:
+        out = js.load(o)
+    
+    #all events recorded in that output file
+    ongoing_events = (out['sep_forecast_submission']['triggers'][0]['particle_intensity']
+                          ['ongoing_events'])
+    
+    #creating lists for values from each event
+    end_times = []                                                                                                                                            
+    start_times = []
+    energy_thresholds = []
+    flux_thresholds = []
+    out_names = []
+    
+    #appending values to lists for each event
+    for i in range(len(ongoing_events)):
+        start_times.append(parse(ongoing_events[i]['start_time']))
+        end_times.append(parse(ongoing_events[i]['end_time']))
+        energy_thresholds.append(ongoing_events[i]['energy_min'])
+        flux_thresholds.append(float(ongoing_events[i]['threshold']))
+    
+    #checking if there was a second event for each threshold
+    for i in range(len(end_times)):
+        end = end_times[i]
+        #if the end time of an event for any threshold was a day before the last day
+        #in the original time window given, will check if ONLY THAT THRESHOLD
+        #had another event after the first one, using the end time of the first
+        #event of that threshold as the new start time of the event window
+        if end.date() < et.date():
+            print('end time to use as new start time: %s' %end)
+            #figuring out which threshold this end time was for
+            flux_thresh = int(flux_thresholds[i])
+            energy_thresh = int(energy_thresholds[i])
+            print('extracting second event for threshold ' + str(flux_thresh) + ' MeV '
+                  + str(energy_thresh) + ' pfu')
+            #new start time (2 days in advance bc the database_extraction function
+            #makes the start time 2 days prior, so will cancel that out)
+            st = end + timedelta(days=2)
+            #thresholds in correct format
+            thresholds = str(energy_thresh) + ',' + str(flux_thresh)
+            print('thresholds: %s' %thresholds)
+            #creating observation data for second event for thresholds given
+            out_names.append(Path(cfg.obs_path) /
+                             database_extraction(st,et,instrument_chosen,subevent,
+                                                 thresholds = thresholds,
+                                                 one_thresh = True))
+            
+    #returns list of all new files created by this function
+    return(out_names)
+    
         
 def multi_event(st,et,instrument_chosen,subevent):
     """
+    all events in one time window (not just two)
+    
     used if there is more than one event occurring within a short time period. will
     generate an output file for every event that occurs within a given time window -
     not to be confused with many_events, which generates output given multiple time
@@ -394,47 +485,15 @@ def multi_event(st,et,instrument_chosen,subevent):
     """
     print('checking for multiple events within given time window')
     
-    out_name_1 = Path(cfg.obs_path) / database_extraction(st,et,instrument_chosen,subevent)
+    #creating file for time window with first events for all thresholds
+    out_name = Path(cfg.obs_path) / database_extraction(st,et,instrument_chosen,subevent)
 
-    with open(out_name_1, 'r') as o:
-        out1 = js.load(o)
+    #creating files for all second events for all thresholds
+    new_files = two_in_one(out_name,et,subevent)
     
-    end_times1 = []
-    start_times1 = []
- 
-    ongoing_events1 = (out1['sep_forecast_submission']['triggers'][0]['particle_intensity']
-                          ['ongoing_events'])
-
-    for i in range(len(ongoing_events1)):
-        start_times1.append(parse(ongoing_events1[i]['start_time']))
-        end_times1.append(parse(ongoing_events1[i]['end_time']))
-    
-    last_end1 = max(end_times1)
-
-    if last_end1.date() < et.date():
-        print('extracting second event')
-        st = last_end1 + timedelta(days=2)
-        out_name_2 = Path(cfg.obs_path) / database_extraction(st,et,instrument_chosen,subevent,detect_previous_event=True)
-    
-    with open(out_name_2, 'r') as o2:
-        out2 = js.load(o2)
-        
-    end_times2 = []
-    start_times2 = []
-    
-    ongoing_events2 = (out2['sep_forecast_submission']['triggers'][0]['particle_intensity']
-                           ['ongoing_events'])
-
-    for i in range(len(ongoing_events2)):
-        start_times2.append(parse(ongoing_events2[i]['start_time']))
-        end_times2.append(parse(ongoing_events2[i]['end_time']))
-    
-    last_end2 = max(end_times2)
-
-    if last_end2.date() < et.date():
-        print('extracting second event')
-        st = last_end2 + timedelta(days=2)
-        out_name_2 = Path(cfg.obs_path) / database_extraction(st,et,instrument_chosen,subevent,detect_previous_event=True)
+    #creating files for any third events for all thresholds that had a second event
+    for file in new_files:
+        two_in_one(file,et,subevent)        
     
     return
         
@@ -443,35 +502,32 @@ def gen_subevent_bools(p_10,p_100):
     given lists of peak fluxes for protons >10 MeV and >100 MeV, creates a boolean
     for whether or not each event is a subevent (doesn't cross a threshold)
     """
+    #list of subevent booleans
     subevent_bools = []
     
+    #extracting 10 MeV peak flux if it exists
     for j in range(len(p_10)):
         try:
             p10 = float(p_10[j])
         except ValueError:
             p10 = 'nan'
         
+        #extracting 100 MeV peak flux if it exists
         try:
             p100 = float(p_100[j])
         except ValueError:
             p100 = 'nan'
         
+        #checking if peak fluxes exist
         if str(p10) != 'nan' and str(p100) != 'nan':
-            if p10 < 10 and p100 < 1:
+            #if the peak fluxes both exist and >10 MeV is both below threshold,
+            #subevent is true (only care about >10 bc of definition of subevent)
+            if p10 < 10:
                 subevent_bools.append(True)
-            else:
-                if str(p10) == 'nan' and str(p100) != 'nan':
-                    if p100 < 1:
-                        subevent_bools.append(True)
-                    else:
-                        subevent_bools.append(False)
-                elif str(p10) != 'nan' and str(p100) == 'nan':
-                    if p10 < 10:
-                        subevent_bools.append(True)
-                    else:
-                        subevent_bools.append(False)
-                else:
-                    subevent_bools.append(True)
+            elif p10 > 10:
+                subevent_bools.append(False)
+        
+        #if >10 MeV doesn't exist, subevent is true
         else:
             subevent_bools.append(True)
             
