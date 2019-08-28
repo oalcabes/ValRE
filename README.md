@@ -16,7 +16,8 @@ ValRE_README.txt
 ValRE_ADDITIONS.txt  
 ValRE.py  
 config.py  
-operational_sep_quantities.py  
+operational_sep_quantities.py 
+operational_sep_quantities_one.py  
 output_to_json.py  
 gen_output.py  
 validation_reports (inner directory - may not be present until first run)  
