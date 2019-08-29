@@ -5,6 +5,11 @@ Created on Thu Aug 15 11:45:12 2019
 @author: oalcabes
 """
 
+"""
+gen_output is a module containing functions that can be used to extract GOES
+observational data for SEP events and format the data into JSON files.
+"""
+
 #generating observation output code
 
 from datetime import timedelta, datetime
@@ -121,7 +126,8 @@ def obs_csv2json(input_file,output_file,example_path,instrument):
         event['fluence'][1]['fluence']=data[i]['fluence>100']
 
 
-        if float(event['peak_intensity']) >= cfg.pfu_threshold[cfg.energy_threshold.index(int(event['energy_min']))]:
+        if float(event['peak_intensity']) >= cfg.pfu_threshold[cfg.energy_threshold.index
+                                                 (int(event['energy_min']))]:
             event['all_clear_boolean'] = 'false'
 
         else:
@@ -197,8 +203,6 @@ def choose_inst(given_start_date,given_end_date): #INPUTS MUST BE DATE OBJECTS
     if len(good_instruments) > 1:
         print('Please choose which instrument you would like to use.')
 
-        #ADD IN SOMETHING ABOUT PRIMARY INSTRUMENT HERE
-
         for j in range(len(good_instruments)):
             print('Type ' + str(j) + ' for ' + str(good_instruments[j]))
 
@@ -228,7 +232,7 @@ def choose_prime_inst(given_start_date,given_end_date):
     #extracting primary dates where instruments are active from csv file
     inst_prime_dates = pd.read_csv(ref_path / 'GOES_primary_assignments.csv', header=3)
 
-    #prime instrument option
+    #figuring out which instrument is primary for given start date
     for d in range(len(inst_prime_dates['Start Date'])):
         change_date = parse(inst_prime_dates['Start Date'][d])
         if given_start_date >= change_date.date():
@@ -236,17 +240,23 @@ def choose_prime_inst(given_start_date,given_end_date):
             backup_inst = inst_prime_dates['EPEAD Secondary'][d]
             end_date = parse(inst_prime_dates['Start Date'][d+1]).date()
 
+            #if no prime instrument available, have to choose which instrument
+            #to use based on which instruments have data for this date
             if str(prime_inst) == 'nan':
-                print('no information about primary instrument available.'
-                      'Choosing instrument based on active date ranges')
-                alternate_output = choose_inst(given_start_date,given_end_date)
+                if str(backup_inst) == 'nan':
+                    print('no information about primary instrument available.'
+                          'Choosing instrument based on active date ranges')
+                    alternate_output = choose_inst(given_start_date,given_end_date)
 
-                return(alternate_output)
+                    return(alternate_output)
+                else:
+                    prime_inst = backup_inst
 
             break
 
     prime_inst = str(prime_inst).split('.')[0]
 
+    #reformatting instrument name
     if len(prime_inst) == 2:
         inst_str = str(prime_inst)
     elif len(prime_inst) == 1:
@@ -254,6 +264,7 @@ def choose_prime_inst(given_start_date,given_end_date):
 
     print('GOES-%s is the primary instrument for given start time' %inst_str)
 
+    #checking to make sure this primary instrument actually has data
     year = str(given_start_date).split('-')[0]
     month = str(given_start_date).split('-')[1]
     url = ('https://satdat.ngdc.noaa.gov/sem/goes/data/avg/'+ year + '/' +
@@ -266,8 +277,10 @@ def choose_prime_inst(given_start_date,given_end_date):
         print('we are using %s as our instrument for observations' %instrument)
 
     except request.HTTPError:
+        #if primary instrument doesn't have data for this date, using backup instrument
         print('GOES-%s does NOT have data available' %inst_str)
 
+        #reformatting backup instrument
         if len(str(backup_inst)) == 2:
             inst_str = str(backup_inst)
         elif len(str(backup_inst)) ==1:
@@ -278,6 +291,9 @@ def choose_prime_inst(given_start_date,given_end_date):
         url = ('https://satdat.ngdc.noaa.gov/sem/goes/data/avg/'+ year + '/'
                + month + '/goes' + inst_str)
 
+        #checking to see if backup instrument has data for this date, if not have
+        #to manually choose which instrument to use based off which instruments
+        #have data available
         try:
             request.urlopen(url)
             print('backup instrument data found - using backup instrument')
@@ -295,10 +311,8 @@ def choose_prime_inst(given_start_date,given_end_date):
     return([instrument,end_date])
 
 def database_extraction(mod_start_time,mod_end_time,instrument_chosen,subevent_bool,
-                        detect_previous_event = False,thresholds='100,1',one_thresh = False):
-    
-    #NOTE: NEED TO FIX THRESHOLDS STUFF WITH THIS RN
-    
+                        detect_previous_event = False,thresholds='100,1',
+                        one_thresh = False):
     """
     a function that creates observational json output files given start and end dates
     by extracting data from the iswep GOES database. Only works with GOES instruments.
@@ -342,6 +356,8 @@ def database_extraction(mod_start_time,mod_end_time,instrument_chosen,subevent_b
     #running katie's code to extract data using chosen instrument and dates
     print('extracting data from GOES website')
     
+    #running for only one threshold if one_thresh is true, otherwise running for default
+    #thresholds as well as any additional threshold given
     if one_thresh:
         one_sep.run_all(str(window_start_time), str(window_end_time), str(instrument),
                         'integral', '', '', True, detect_previous_event, thresholds)    
@@ -373,10 +389,12 @@ def database_extraction(mod_start_time,mod_end_time,instrument_chosen,subevent_b
             print('thresholds: %s' %thresholds)
                
             if one_thresh:
+                #name includes threshold if only ran for one threshold
                 new_obs_name = ('sep_values_' + str(instrument) + '_integral_gt' +
                                 str(thresholds).split(',')[0] + '_' + str(thresholds).split(',')[1] + 'pfu_' +
                                 day.strftime('%Y_%m_%d').replace('_0','_') + '.csv')
             else:
+                #otherwise only includes date ran for
                 new_obs_name = ('sep_values_' + str(instrument) + '_integral_' +
                                 day.strftime('%Y_%m_%d').replace('_0','_') + '.csv')
                 
@@ -404,10 +422,6 @@ def database_extraction(mod_start_time,mod_end_time,instrument_chosen,subevent_b
                 return(obs_name)
             else:
                 print('no csv file found with this date, checking next one')
-        #if the json file has been created, not running for anymore dates
-        #else:
-            #break
-            
         
 def two_in_one(obs_file,et,subevent):
     """
@@ -575,7 +589,8 @@ def many_events(start_time,end_time,subevent_bools):
         #if both start and end times are available, running the code
         if yes_st and yes_et:
             #event must be after Nov. 2010 because currently no capability for
-            #instruments in use before then
+            #instruments in use before then - change this if you have that
+            #capability
             if st > datetime(2010,9,1):
                 try:
                     print('got start and end times! running database extraction')  
