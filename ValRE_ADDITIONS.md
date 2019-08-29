@@ -56,7 +56,7 @@ a. INPUT FILES
    ```
    and again, you can just add another or statement in both if statements with:
    ```python
-   mod_start_time.strftime(your format) in str(obs_f)
+   mod_start_time.strftime('your format') in str(obs_f)
    ```          
 2. MODEL PREDICTION WINDOW  
 some models do not have predictions windows, but simply have one value at one time (for example, calculating
