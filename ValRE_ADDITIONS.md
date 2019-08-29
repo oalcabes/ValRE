@@ -77,7 +77,7 @@ Likely Problems with gen_output Module
 ======================================
 1. UPDATES TO operational_sep_quantities.py: If there is a new version of operational_sep_quantities.py, you can replace the old copy of
 the file in the ValRE folder with the new copy. However, if the inputs or outputs to the function have changed, it may be necessary to
-alter the way gen_ouput.py incorporates the code accordingly.
+alter the way gen_ouput.py incorporates the code accordingly.  
     a. CHANGES TO INPUT: Most alterations to the input can be made in the database_extraction function in the gen_output.py code, before
     the sep.run_all command is run.  
     b. CHANGES TO OUTPUT: The current output files of operational_sep_quantities.py (as of July 2019) are csv documents with various 
