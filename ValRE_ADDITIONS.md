@@ -71,5 +71,4 @@ alter the way gen_ouput.py incorporates the code accordingly.
 previous event value can be set to false, as most events that ValRE uses do not occur right after each other. However, for such an
 event, if it is necessary to go into the GOES database to retrieve observational data, it may be necessary to change the detect previous
 event value to True. ValRE does not currently have a way to automate this, and it may be necessary to validate that particular event
-manually. If you need to add in an automation, you can edit the function database_extraction in gen_output.py and change the input in 
-the function sep.run_all from cfg.detect_previous_event to your own value.
+manually. If you need to add in an automation, you can edit the function database_extraction in gen_output.py and change default input to your own value.
