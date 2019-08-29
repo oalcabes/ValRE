@@ -171,7 +171,7 @@ def generate_ref_sheet(output_path):
                    ['Relative Operating Characteristic Skill Score (RSS)','',
                     '0 to 1','1'],
                    ['Mean Percentage Error','','-infinity to infinity','0'],
-                   ['Mean Absolute Percentage Error','','0 to infinity','0']) #check this value
+                   ['Mean Absolute Percentage Error','','0 to infinity','0'])
 
     metric_ref_table=Table(metric_ref)
     metric_ref_table.setStyle(TableStyle([('BACKGROUND',(0,2),(3,13),
@@ -461,7 +461,8 @@ for f in obs_files:
                       %all_clear_boolean_obs)
             except:
                 print('all clear boolean not given - calculating')
-                all_clear_boolean_obs = calc_all_clear_flux(peak_intensity_obs,flux_threshold)                  
+                all_clear_boolean_obs = calc_all_clear_flux(peak_intensity_obs,
+                                                            flux_threshold)                  
             
             
             ### MODEL ###
@@ -561,7 +562,8 @@ for f in obs_files:
                         #appending other values from the model to lists
                         if mod_type == 'flux':
                             mod_peak_list.append(float(mod_values["peak_flux"]))
-                            #if no peak time is available, just making it the start time of the file
+                            #if no peak time is available, just making it the start time
+                            #of the file
                             if mod_values["peak_time"] == "undef":
                                 mod_peak_times.append(mod_start_time)
                             else:
@@ -624,7 +626,9 @@ for f in obs_files:
                 #percent error and mean absolute percent error)
                 try:
                     print('calculating peak intensity differences')
-                    rel_change.append((float(peak_intensity_obs) - float(peak_intensity_model))/float(peak_intensity_obs))
+                    rel_change.append((float(peak_intensity_obs) -
+                                       float(peak_intensity_model)) /
+                                       float(peak_intensity_obs))
                 except:
                     print('incorrect data for peak difference calculations')
  
@@ -665,8 +669,8 @@ for f in obs_files:
                              float(probability),xdate=True,
                              ydate=False,marker='o',c='red',label='forecast')
                     prob_axes[j].text(1.05,0.5,'>' + str(cfg.energy_threshold[j])
-                    + ' MeV\n' + str(cfg.pfu_threshold[j]) +
-                                         ' pfu threshold',transform=prob_axes[j].transAxes)
+                                      + ' MeV\n' + str(cfg.pfu_threshold[j]) +
+                                      ' pfu threshold', transform=prob_axes[j].transAxes)
                     if all_clear_boolean_obs == 'true':
                         obs_prob = 0
                     else:
@@ -744,7 +748,8 @@ if mod_type == 'flux':
 
 #calculating metric scores for each given threshold
 for j in range(num_thresholds):
-    print('calculating all other metrics for energy threshold %s MeV' %cfg.energy_threshold[j])
+    print('calculating all other metrics for energy threshold %s MeV'
+          %cfg.energy_threshold[j])
 
     #hits
     h = hits[j] + cfg.man_hits[j]
@@ -761,7 +766,7 @@ for j in range(num_thresholds):
 
     #checking if model actually had data for this threshold
     if t == 0:
-        print('no data for this threshold, no metric scores calculated' )
+        print('no data for this threshold, no metric scores calculated')
         threshold_avail = False
     else:
         threshold_avail = True
@@ -831,7 +836,8 @@ for j in range(num_thresholds):
 ### WRITING REPORTS ###
     
     if threshold_avail:
-        print('writing validation report for %s MeV energy channel' %cfg.energy_threshold[j])
+        print('writing validation report for %s MeV energy channel'
+              %cfg.energy_threshold[j])
 
         #writing metrics into PDF report
         if cfg.PDF_report:
@@ -842,7 +848,8 @@ for j in range(num_thresholds):
                                  ['Hit Rate', H], ['False Alarm Rate',F,],
                                  ['Frequency of Misses', FOM],
                                  ['Probability of Correct Negatives',POCN],
-                                 ['False Alarm Ratio', FAR], ['Detection Failure Ratio',DFR],
+                                 ['False Alarm Ratio', FAR],
+                                 ['Detection Failure Ratio',DFR],
                                  ['Frequency of Correct Negatives', FOCN],
                                  ['Threat Score', TS],
                                  ['Odds Ratio', OR], ['True Skill Score', TSS],
@@ -854,7 +861,8 @@ for j in range(num_thresholds):
                                  ['Hit Rate', H], ['False Alarm Rate',F,],
                                  ['Frequency of Misses', FOM],
                                  ['Probability of Correct Negatives',POCN],
-                                 ['False Alarm Ratio', FAR], ['Detection Failure Ratio',DFR],
+                                 ['False Alarm Ratio', FAR],
+                                 ['Detection Failure Ratio',DFR],
                                  ['Frequency of Correct Negatives', FOCN],
                                  ['Threat Score', TS],
                                  ['Odds Ratio', OR], ['True Skill Score', TSS],
@@ -898,7 +906,8 @@ for j in range(num_thresholds):
 
             #putting the instruments used for observations into the report
             instrument_report = Paragraph('Instruments used for observations: %s'
-                                          %observation_instruments, style = styles['Normal'])
+                                          %observation_instruments,
+                                          style = styles['Normal'])
             
             #adding all of these objects to the report list
             report_elements.append(instrument_report)
@@ -917,18 +926,22 @@ for j in range(num_thresholds):
                                 'Probability of Correct Negatives' : POCN,
                                 'False Alarm Ratio' : FAR,
                                 'Detection Failure Ratio' : DFR,
-                                'Frequency of Correct Negatives' : FOCN, 'Threat Score' : TS,
+                                'Frequency of Correct Negatives' : FOCN,
+                                'Threat Score' : TS,
                                 'Odds Ratio' : OR, 'True Skill Score' : TSS,
-                                'Heidke Skill Score' : HSS, 'Odds Ratio Skill Score' : ORSS}
+                                'Heidke Skill Score' : HSS,
+                                'Odds Ratio Skill Score' : ORSS}
             elif mod_type == 'flux':
                 metrics_dict = {'Percent Correct' : PC, 'Bias' : bias, 'Hit Rate' : H,
                                 'False Alarm Rate' : F, 'Frequency of Misses' : FOM,
                                 'Probability of Correct Negatives' : POCN,
                                 'False Alarm Ratio' : FAR,
                                 'Detection Failure Ratio' : DFR,
-                                'Frequency of Correct Negatives' : FOCN, 'Threat Score' : TS,
+                                'Frequency of Correct Negatives' : FOCN,
+                                'Threat Score' : TS,
                                 'Odds Ratio' : OR, 'True Skill Score' : TSS,
-                                'Heidke Skill Score' : HSS, 'Odds Ratio Skill Score' : ORSS,
+                                'Heidke Skill Score' : HSS,
+                                'Odds Ratio Skill Score' : ORSS,
                                 'Mean Percentage Error' : MPE,
                                 'Mean Absolute Percentage Error' : MAPE}
                 
@@ -1089,7 +1102,6 @@ print('total misses = %s' %(misses+cfg.man_misses))
 #%%
 
 print('finalizing reports')
-
 
 
 if cfg.PDF_report:
