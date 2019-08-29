@@ -26,11 +26,13 @@ a. INPUT FILES: to load in your input files, you may need to change the format o
    it is necessary to change this in the actual code as opposed to just changing your files, you can edit the date_range function
    lines:  
    
+   ```python
       d2_str1 = str(d2)
       d2_str2 = d2.strftime('%Y_%m_%d')
       for f in all_files:
          if d2_str1 in str(f) or d2_str2 in str(f):
-         
+    ```
+    
    If you need to add a new date format, simply create d2_str3 = d2.strftime('your new format'), and append the line
    if d2_str1 in str(f) or d2_str2 in str(f): --> if d2_str1 in str(f) or d2_str2 in str(f) or d3_str3 in str(f):
 b. OUTPUT FILES: Similarly to input files, if you're having problems loading your output files and need to change the form of the
