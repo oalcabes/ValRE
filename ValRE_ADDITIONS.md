@@ -20,9 +20,11 @@ what ValRE does:
 
 Likely Problems with ValRE
 ==========================
-1. NOT LOADING IN FILES CORRECTLY: There are a few things you may need to change in the code if it isn't loading in your files 
+1. NOT LOADING IN FILES CORRECTLY  
+There are a few things you may need to change in the code if it isn't loading in your files 
 correctly, and you can't just change your output files.  
-a. INPUT FILES: to load in your input files, you may need to change the format of the datestring that is in the file name. If
+a. INPUT FILES  
+   to load in your input files, you may need to change the format of the datestring that is in the file name. If
    it is necessary to change this in the actual code as opposed to just changing your files, you can edit the date_range function
    lines:  
    
@@ -44,7 +46,8 @@ a. INPUT FILES: to load in your input files, you may need to change the format o
    ```python
    if d2_str1 in str(f) or d2_str2 in str(f) or d3_str3 in str(f):
    ```
-   b. OUTPUT FILES: Similarly to input files, if you're having problems loading your output files and need to change the form of the
+   b. OUTPUT FILES  
+   Similarly to input files, if you're having problems loading your output files and need to change the form of the
    datestring, you can alter the following lines in the main function of the code:
    ```python
    if str(mod_start_time.date()) in str(obs_files) or mod_start_time.strftime('%Y_%m_%d') in str(obs_files):
@@ -55,7 +58,8 @@ a. INPUT FILES: to load in your input files, you may need to change the format o
    ```python
    mod_start_time.strftime(your format) in str(obs_f)
    ```          
-2. MODEL PREDICTION WINDOW: some models do not have predictions windows, but simply have one value at one time (for example, calculating
+2. MODEL PREDICTION WINDOW  
+some models do not have predictions windows, but simply have one value at one time (for example, calculating
 a flux based off of a CME speed). If you have such a model and need to run it through ValRE, I suggest pre-processing your model start
 and end times according to the times the model would actually be predicting for. If more alterations are necessary, edits to ValRE would 
 likely occur in the following if statement in the main code:
@@ -71,21 +75,26 @@ elif obs_start_time < mod_end_time:
     #event starts, so using this file
     print('model file recorded event')
 ```
+3. READING IN MODEL THRESHOLDS  
           
           
 Likely Problems with gen_output Module
 ======================================
-1. UPDATES TO operational_sep_quantities.py: If there is a new version of operational_sep_quantities.py, you can replace the old copy of
+1. UPDATES TO operational_sep_quantities.py  
+If there is a new version of operational_sep_quantities.py, you can replace the old copy of
 the file in the ValRE folder with the new copy. However, if the inputs or outputs to the function have changed, it may be necessary to
 alter the way gen_ouput.py incorporates the code accordingly.  
-    a. CHANGES TO INPUT: Most alterations to the input can be made in the database_extraction function in the gen_output.py code, before
-    the sep.run_all command is run.  
-    b. CHANGES TO OUTPUT: The current output files of operational_sep_quantities.py (as of July 2019) are csv documents with various 
-    important values. The function (located in the ValRE folder) output_to_json.py includes a function called obs_csv2json, which loads 
-    in all of the values from the csv files and reformats them into the JSON format given by the CCMC. If the output of 
-    operational_sep_quantities.py changes or has problems, these observational JSON files may be created incorrectly. Therefore, it may 
-    be necessary to edit the obs_csv2json function directly to make sure all of the values are correctly loaded into JSON.  
-2. DETECT PREVIOUS EVENT VALUE: This is an input value for the operational_sep_quantities.py module. For most ValRE purposes, the detect
+    a. CHANGES TO INPUT  
+       Most alterations to the input can be made in the database_extraction function in the gen_output.py code, before
+       the sep.run_all command is run.  
+    b. CHANGES TO OUTPUT  
+       The current output files of operational_sep_quantities.py (as of July 2019) are csv documents with various 
+       important values. The function (located in the ValRE folder) output_to_json.py includes a function called obs_csv2json, which 
+       loads in all of the values from the csv files and reformats them into the JSON format given by the CCMC. If the output of 
+       operational_sep_quantities.py changes or has problems, these observational JSON files may be created incorrectly. Therefore, it 
+       may be necessary to edit the obs_csv2json function directly to make sure all of the values are correctly loaded into JSON.  
+2. DETECT PREVIOUS EVENT VALUE  
+This is an input value for the operational_sep_quantities.py module. For most ValRE purposes, the detect
 previous event value can be set to false, as most events that ValRE uses do not occur right after each other. However, for such an
 event, if it is necessary to go into the GOES database to retrieve observational data, it may be necessary to change the detect previous
 event value to True. ValRE does not currently have a way to automate this, and it may be necessary to validate that particular event
