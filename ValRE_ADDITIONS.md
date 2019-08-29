@@ -79,12 +79,12 @@ Likely Problems with gen_output Module
 the file in the ValRE folder with the new copy. However, if the inputs or outputs to the function have changed, it may be necessary to
 alter the way gen_ouput.py incorporates the code accordingly.
     a. CHANGES TO INPUT: Most alterations to the input can be made in the database_extraction function in the gen_output.py code, before
-    the sep.run_all command is run.
+    the sep.run_all command is run.  
     b. CHANGES TO OUTPUT: The current output files of operational_sep_quantities.py (as of July 2019) are csv documents with various 
     important values. The function (located in the ValRE folder) output_to_json.py includes a function called obs_csv2json, which loads 
     in all of the values from the csv files and reformats them into the JSON format given by the CCMC. If the output of 
     operational_sep_quantities.py changes or has problems, these observational JSON files may be created incorrectly. Therefore, it may 
-    be necessary to edit the obs_csv2json function directly to make sure all of the values are correctly loaded into JSON.
+    be necessary to edit the obs_csv2json function directly to make sure all of the values are correctly loaded into JSON.  
 2. DETECT PREVIOUS EVENT VALUE: This is an input value for the operational_sep_quantities.py module. For most ValRE purposes, the detect
 previous event value can be set to false, as most events that ValRE uses do not occur right after each other. However, for such an
 event, if it is necessary to go into the GOES database to retrieve observational data, it may be necessary to change the detect previous
