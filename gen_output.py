@@ -315,7 +315,7 @@ def database_extraction(mod_start_time,mod_end_time,instrument_chosen,subevent_b
                         one_thresh = False):
     """
     a function that creates observational json output files given start and end dates
-    by extracting data from the iswep GOES database. Only works with GOES instruments.
+    by extracting data from the GOES database. Only works with GOES instruments.
     """
     obs_file_created = False
 
