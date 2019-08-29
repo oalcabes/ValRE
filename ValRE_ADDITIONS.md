@@ -31,15 +31,17 @@ a. INPUT FILES: to load in your input files, you may need to change the format o
    for f in all_files:  
       if d2_str1 in str(f) or d2_str2 in str(f):  
   
-...If you need to add a new date format, simply create d2_str3 = d2.strftime('your new format'), and append the line
-...if d2_str1 in str(f) or d2_str2 in str(f): --> if d2_str1 in str(f) or d2_str2 in str(f) or d3_str3 in str(f):
-..b. OUTPUT FILES: Similarly to input files, if you're having problems loading your output files and need to change the form of the
-    datestring, you can alter the following lines in the main function of the code:    
+   If you need to add a new date format, simply create d2_str3 = d2.strftime('your new format'), and append the line
+   if d2_str1 in str(f) or d2_str2 in str(f): --> if d2_str1 in str(f) or d2_str2 in str(f) or d3_str3 in str(f):
+b. OUTPUT FILES: Similarly to input files, if you're having problems loading your output files and need to change the form of the
+   datestring, you can alter the following lines in the main function of the code:  
+   
         if str(mod_start_time.date()) in str(obs_files) or mod_start_time.strftime('%Y_%m_%d') in str(obs_files):
            for obs_f in obs_files:
                if str(mod_start_time.date()) in str(obs_f) or mod_start_time.strftime('%Y_%m_%d') in str(obs_f):
      and again, you can just add another or statement in both if statements with"
           mod_start_time.strftime(your format) in str(obs_f)
+          
 2. MODEL PREDICTION WINDOW: some models do not have predictions windows, but simply have one value at one time (for example, calculating
 a flux based off of a CME speed). If you have such a model and need to run it through ValRE, I suggest pre-processing your model start
 and end times according to the times the model would actually be predicting for. If more alterations are necessary, edits to ValRE would 
