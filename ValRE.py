@@ -309,8 +309,6 @@ def extract_mod_values(all_forecasts,mod_type,i,flux_threshold,prob_threshold):
 
         print('model predicted probability values found')
         print('probability = %s' %mod_values["probability"])
-        print('probability threshold = %s'
-              %mod_values["probability_threshold"])
 
         print('extracting all clear boolean from model')
         
