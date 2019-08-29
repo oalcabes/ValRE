@@ -1,4 +1,5 @@
 # ValRE
+## by Olivia D. N. Alcabes (oalcabes@uchicago.edu)
 
 ValRE validates spaceweather forecasting models of SEP events. Validation is done by
 comparing model forecasts of events to historical observations and generating skill scores,
@@ -20,9 +21,9 @@ operational_sep_quantities.py
 operational_sep_quantities_one.py  
 output_to_json.py  
 gen_output.py  
-validation_reports (inner directory - may not be present until first run)  
-validation_reference.pdf (will be created with first ValRE run, reference sheet for metrics)
-validation_reports/figures (inner directory that will house PNG files)  
+validation_reports (inner directory that will house all created reports - may not be present until first run)  
+validation_reference.pdf (will be created with first ValRE run, reference sheet for metrics)  
+validation_reports/figures (inner directory that will house PNG files of plots)  
 GOES_primary_assignments.csv  
 instrument_dates.csv  
 
@@ -38,10 +39,10 @@ pip install reportlab
 
 The full list of modules that ValRE uses can be found at the beginning of the ValRE.py code.
 
-This program makes use of the software "operational_sep_quantities" created by Katie Whitman, a program
-which has extensive that can be found with the command "pydoc operational_sep_quantities".
+This program makes use of the software "operational_sep_quantities" and "operational_sep_quantities_one" created by Katie Whitman,
+a program which has extensive that can be found with the command "pydoc operational_sep_quantities".
 
-There are two other scripts included with the ValRE package, gen_output.py and output_to_json.py, which are scripts that can be used to 
+The module "gen_output" is also included with the ValRE package, which are scripts that can be used to 
 generate observational output from operational_sep_quantities.py, and each have their own documentation comments within the code.
 
 Assumptions/Simplifications
