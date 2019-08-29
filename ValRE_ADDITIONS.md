@@ -26,7 +26,7 @@ correctly, and you can't just change your output files.
    it is necessary to change this in the actual code as opposed to just changing your files, you can edit the date_range function
    lines:  
      
-...d2_str1 = str(d2)
+⋅⋅d2_str1 = str(d2)
 ...d2_str2 = d2.strftime('%Y_%m_%d')
 ...# print(d2)
 ...for f in all_files:
