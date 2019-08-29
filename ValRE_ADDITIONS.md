@@ -31,24 +31,39 @@ a. INPUT FILES: to load in your input files, you may need to change the format o
       d2_str2 = d2.strftime('%Y_%m_%d')
       for f in all_files:
          if d2_str1 in str(f) or d2_str2 in str(f):
-    ```  
-    
-   If you need to add a new date format, simply create ```python d2_str3 = d2.strftime('your new format')```, and append the line
-   ```python if d2_str1 in str(f) or d2_str2 in str(f):``` to ```python if d2_str1 in str(f) or d2_str2 in str(f) or d3_str3 in str(f):```
-   b. OUTPUT FILES: Similarly to input files, if you're having problems loading your output files and need to change the form of the
+   ```
+   If you need to add a new date format, simply create
+   ```python
+   d2_str3 = d2.strftime('your new format')
+   ```
+   , and append the line
+   ```python
+   if d2_str1 in str(f) or d2_str2 in str(f):
+   ```
+   to
+   ```python
+   if d2_str1 in str(f) or d2_str2 in str(f) or d3_str3 in str(f):
+   ```
+b. OUTPUT FILES: Similarly to input files, if you're having problems loading your output files and need to change the form of the
    datestring, you can alter the following lines in the main function of the code:  
    
+        ```python
         if str(mod_start_time.date()) in str(obs_files) or mod_start_time.strftime('%Y_%m_%d') in str(obs_files):
            for obs_f in obs_files:
                if str(mod_start_time.date()) in str(obs_f) or mod_start_time.strftime('%Y_%m_%d') in str(obs_f):
+        ```
                
-   and again, you can just add another or statement in both if statements with"
-          mod_start_time.strftime(your format) in str(obs_f)
+   and again, you can just add another or statement in both if statements with:
+   ```python
+   mod_start_time.strftime(your format) in str(obs_f)
+   ```
           
 2. MODEL PREDICTION WINDOW: some models do not have predictions windows, but simply have one value at one time (for example, calculating
 a flux based off of a CME speed). If you have such a model and need to run it through ValRE, I suggest pre-processing your model start
 and end times according to the times the model would actually be predicting for. If more alterations are necessary, edits to ValRE would 
 likely occur in the following if statement in the main code:
+
+                    ```python
                     if mod_end_time < obs_start_time:
                         #model forecast ends before event starts
                         print('model file too early - skipping')            
@@ -59,6 +74,7 @@ likely occur in the following if statement in the main code:
                         #model forecast starts before event begins and ends after
                         #event starts, so using this file
                         print('model file recorded event')
+                    ```
           
           
 Likely Problems with gen_output Module
