@@ -34,10 +34,10 @@ Most of these libraries are included in Anaconda Navigator. However, it may be n
 yourself. In order to do so, type: "pip install <library>".
    
 Libraries you will likely have to install:
-pip install wget
-pip install reportlab
-pip install pathlib
-pip install sklearn
+pip install wget  
+pip install reportlab  
+pip install pathlib  
+pip install sklearn  
 
 The full list of modules that ValRE uses can be found at the beginning of the ValRE.py code.
 
