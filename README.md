@@ -7,7 +7,7 @@ which are written into reports (in PDF and/or JSON format). ValRE also creates p
 for qualitative verification, which appear in the PDF and are present as PNG files in the
 validation_reports/figures folder.
 
-***NOTE: ValRE was not intended for the creation of model output or observational output. You must already have output present in some directory on your computer in order to run ValRE.
+***NOTE: ValRE was not intended for the creation of model output or observational output. You must already have output present in some directory on your computer in order to run ValRE.***
 
 ADDITIONALLY: IF YOU NEED TO ALTER THE CODE, PLEASE READ ValRE_ADDITIONS.TXT FIRST
 
@@ -49,20 +49,20 @@ file called "gen_output_README.md", which can be found in this package.
 Assumptions/Simplifications
 ===========================
 please be aware of all assumptions and simplifications ValRE makes before running the code so you do not get unclear or incorrect
-output.
+reports.
 - all output files have some string of the date in them in the forms: YYYY-MM-DD or YYYY_MM_DD
 - model file start and date times are the model's PREDICTION WINDOW. That is, the model is predicting an all clear for that given time 
   period
-  **note: if model start and end times are the same, that is the same as saying there has not been a prediction
+  **note: if model start and end times are the same, that is the same as saying there has not been a prediction**
 - all output files are in the JSON form created by the CCMC (this example format can be found in
   ref_files/example_sepscoreboard_json_file_v20190228.json - however, please do not move/alter this file from its current directory as
-  ValRE or one of the other functions may need to read it in. If you need to use it please just copy it)
+  ValRE or one of the functions in the gen_output module may need to read it in. If you need to move it please create a copy)
 - there is one observation file per event
 - all JSON files present in given output directories (and all subdirectories) are to be used for validation (if there are files you
   don't want to use for validation, put them in a different folder)
 - when extracting forecast values for peak flux or probability, if a threshold is crossed, ValRE will use the first probability or flux
   value that crosses the threshold as opposed to the highest value for mean percent error and mean absolute percent error calculations,
-  as well as for plotting purposes. if no threshold is crossed, ValRE will use the highest probability or flux value forecasted for a 
+  as well as for plotting purposes. If no threshold is crossed, ValRE will use the highest probability or flux value forecasted for a 
   given event.
 - ValRE will only use flux and probability thresholds given in the configuration file. If your model output has a different threshold   
   than that given in the configuration file, ValRE will not read it or use it. 
@@ -74,20 +74,20 @@ examples of options if you don't already have one.
 
 In the configuration document, specify:
 1. the directory on your computer containing model output
-2. the name of the model
-3. the directory on your computer containing observational output (or the directory where you would like
+2. the directory on your computer containing observational output (or the directory where you would like
    new observational output to be stored)
+3. the name of the model
 4. the date for the first day you are interested in validating, separated by year, month, and day
 5. the date for the last day you are interested in validating, separated by year, month, and day
-   **NOTE: you do not actually have to have model output for your beginning and end dates. ValRE will
-   simply extract all model files that are dated within the date range that you have given. Again, the
-   date MUST be in the name of the model file!! *(note to self - talk to phil abt this prob)
-6. detect previous event value ** explained in detail below, please read before changing from False
+   **NOTE: you do not actually have to have model output for your beginning and end dates. ValRE will simply extract all model files that are dated within the date range that you have given. Again, the date MUST be in the name of the model file!!**
+6. the window of time before the actual event starts that ValRE should check for model output within (ie check for model output
+   1 day before event, 2 days, etc. and see if those have actually forecasted for this event)
 7. thresholds for the energy, the flux, and/or the probability
-8. whether or not you'd like PDF and JSON reports
+8. whether or not you'd like PDF and/or JSON reports
 9. manual inputs for hits, misses, correct negatives, and false alarms
+10. whether or not you'd like to consider having no model file for a given event a miss
 
-The formats in which all of these values must be given in are detailed in the comments of the
+The formats in which all of these values must be in are detailed in the comments of the
 configuration file, as well as in the "input formats" section below.
 
 Once you've filled out the configuration file, you can run ValRE from the command line. Once ValRE is finished
@@ -133,7 +133,9 @@ For example, if your model can only predict an event one day before it happens,
 put in one. If your model has the potential to predict an event 5 days before it
 happens, put in 5. The smallest value is 1 day, so if your model only has the
 potential to predict an event a few hours before it happens, leave this value
-as 1.
+as 1. ValRE will check each model file that has a date within this time window
+and make sure it is actually forecasting for the given event and not for some other
+earlier or later event, so if this window is very large, it should not be a problem.
 
 START AND END DATES
 ---
