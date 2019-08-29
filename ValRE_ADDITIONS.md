@@ -46,11 +46,11 @@ a. INPUT FILES: to load in your input files, you may need to change the format o
    ```
 b. OUTPUT FILES: Similarly to input files, if you're having problems loading your output files and need to change the form of the
    datestring, you can alter the following lines in the main function of the code:
-        ```python
-        if str(mod_start_time.date()) in str(obs_files) or mod_start_time.strftime('%Y_%m_%d') in str(obs_files):
-           for obs_f in obs_files:
-               if str(mod_start_time.date()) in str(obs_f) or mod_start_time.strftime('%Y_%m_%d') in str(obs_f):
-        ```
+   ```python
+   if str(mod_start_time.date()) in str(obs_files) or mod_start_time.strftime('%Y_%m_%d') in str(obs_files):
+      for obs_f in obs_files:
+          if str(mod_start_time.date()) in str(obs_f) or mod_start_time.strftime('%Y_%m_%d') in str(obs_f):
+   ```
    and again, you can just add another or statement in both if statements with:
    ```python
    mod_start_time.strftime(your format) in str(obs_f)
