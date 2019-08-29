@@ -30,11 +30,12 @@ instrument_dates.csv
 
 Python Libraries
 ================
-Before running ValRE, you must make sure you have the correct Python libraries loaded on your computer.
+Before running ValRE, you must make sure you have **PYTHON 3** and the correct Python libraries loaded on your computer.
 Most of these libraries are included in Anaconda Navigator. However, it may be necessary to install some
 yourself. In order to do so, type: "pip install <library>".
    
 Libraries you will likely have to install:
+(may be necessary to type pip3 instead of pip if you also of python 2 installed on your computer)
 pip install wget  
 pip install reportlab  
 pip install pathlib  
