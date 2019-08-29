@@ -36,7 +36,7 @@ a. INPUT FILES: to load in your input files, you may need to change the format o
    ```python
    d2_str3 = d2.strftime('your new format')
    ```
-   , and append the line
+   and append the line
    ```python
    if d2_str1 in str(f) or d2_str2 in str(f):
    ```
@@ -45,14 +45,12 @@ a. INPUT FILES: to load in your input files, you may need to change the format o
    if d2_str1 in str(f) or d2_str2 in str(f) or d3_str3 in str(f):
    ```
 b. OUTPUT FILES: Similarly to input files, if you're having problems loading your output files and need to change the form of the
-   datestring, you can alter the following lines in the main function of the code:  
-   
+   datestring, you can alter the following lines in the main function of the code:
         ```python
         if str(mod_start_time.date()) in str(obs_files) or mod_start_time.strftime('%Y_%m_%d') in str(obs_files):
            for obs_f in obs_files:
                if str(mod_start_time.date()) in str(obs_f) or mod_start_time.strftime('%Y_%m_%d') in str(obs_f):
         ```
-               
    and again, you can just add another or statement in both if statements with:
    ```python
    mod_start_time.strftime(your format) in str(obs_f)
