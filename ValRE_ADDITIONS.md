@@ -111,3 +111,7 @@ previous event value can be set to false, as most events that ValRE uses do not 
 event, if it is necessary to go into the GOES database to retrieve observational data, it may be necessary to change the detect previous
 event value to True. ValRE does not currently have a way to automate this, and it may be necessary to validate that particular event
 manually. If you need to add in an automation, you can edit the function database_extraction in gen_output.py and change default input to your own value.
+3. TWO_IN_ONE AND MULTI_EVENT FUNCTIONS  
+If, for time windows in which multiple events occur, events are being counted twice or are being fully missed, it will be necessary to
+alter these functions according to the problem. Both have fairly short code, but it is often necessary to run two_in_one
+through multi_event as opposed to on its own.
