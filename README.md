@@ -5,7 +5,7 @@ ValRE validates spaceweather forecasting models of SEP events. Validation is don
 comparing model forecasts of events to historical observations and generating skill scores,
 which are written into reports (in PDF and/or JSON format). ValRE also creates plots
 for qualitative verification, which appear in the PDF and are present as PNG files in the
-validation_reports/figures folder.
+validation_reports/figures folder.  
 
 ***NOTE: ValRE was not intended for the creation of model output or observational output.***
 ***You must already have output present in some directory on your computer in order to run ValRE.***
@@ -56,7 +56,7 @@ please be aware of all assumptions and simplifications ValRE makes before runnin
 reports.
 - all output files have some string of the date in them in the forms: YYYY-MM-DD or YYYY_MM_DD
 - model file start and date times are the model's PREDICTION WINDOW. That is, the model is predicting an all clear for that given time 
-  period
+  period  
   **note: if model start and end times are the same, that is the same as saying there has not been a prediction**
 - all output files are in the JSON form created by the CCMC (this example format can be found in
   ref_files/example_sepscoreboard_json_file_v20190228.json - however, please do not move/alter this file from its current directory as
@@ -82,7 +82,7 @@ In the configuration document, specify:
    new observational output to be stored)
 3. the name of the model
 4. the date for the first day you are interested in validating, separated by year, month, and day
-5. the date for the last day you are interested in validating, separated by year, month, and day
+5. the date for the last day you are interested in validating, separated by year, month, and day  
    **NOTE: you do not actually have to have model output for your beginning and end dates.**
    **ValRE will simply extract all model files that are dated within the date range that you have given.**
    **Again, the date MUST be in the name of the model file!!**
