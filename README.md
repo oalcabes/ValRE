@@ -128,8 +128,10 @@ FORMAT: integer
 EX: 1  
 OTHER NOTES: the amount of days before the event that a model may have predictions for.
 For example, if your model can only predict an event one day before it happens, 
-put in 1. If your model has the potential to predict an event 5 days before it
-happens, put in 5.
+put in one. If your model has the potential to predict an event 5 days before it
+happens, put in 5. The smallest value is 1 day, so if your model only has the
+potential to predict an event a few hours before it happens, leave this value
+as 1.
 
 START AND END DATES
 ---
@@ -148,11 +150,9 @@ OTHER NOTES: indices of threshold lists must correspond to each other. Ie, if th
 value in energy_thresholds is 10, the first value of the pfu_thresholds must be the
 corresponding flux value of 10. If the model you are using is probabilistic, you may
 comment out pfu_threshold; similarly, if the model you are using is not probabilistic,
-you may comment out prob_threshold. If prob_threshold is commented out for a
-probabilistic model, ValRE will assume that the model output files contain probability
-thresholds and will read them in instead.
-Finally, ValRE will check if a model does not have output for each threshold and
-if it doesn't simply won't create a report for that threshold.
+you may comment out prob_threshold. However, leaving all values commented in, even if
+unused, will not be a problem. Finally, ValRE will check if a model does not have output
+for each threshold and if it doesn't simply won't create a report for that threshold.
 
 REPORTS
 ---
@@ -164,11 +164,13 @@ MANUAL ADDITIONS
 ---
 FORMAT: lists of integers  
 EX. [0,5]  
-OTHER NOTES: All of these value should be 0 if you have not completed any calculations yourself. Lists must be the same length as 
-energy_threshold determined in the thresholds category above, and each value is the amount of manual hits, misses, correct negatives, or 
-false alarms for the corresponding energy_threshold that has been calculated manually. These values can be added to if there are 
-particular events that ValRE is not able to use model and/or observational output to calculate, but you would still like to be included 
-for calculations of metric scores.
+OTHER NOTES: lists must be the same length as energy_threshold determined
+in the thresholds category above, and each value is the amount of hits,
+misses, correct negatives, or false alarms for the corresponding energy_threshold
+that has been calculated manually. These values can be added to if there
+are particular events that ValRE is not able to use model and/or observational
+output to calculate, but you would still like them to be included for calculations
+of metric scores.
 
 NO MODEL FILE
 ---
