@@ -1,4 +1,5 @@
-# gen_output documentation
+# gen_output
+## by Olivia D. N. Alcabes (oalcabes@uchicago.edu)
 
 gen_output.py is a module intended to be used to generate observation JSON files by extracting GOES data with the 
 "operational_sep_quantities" and "operational_sep_quantities_one" functions written by Katie Whitman.
