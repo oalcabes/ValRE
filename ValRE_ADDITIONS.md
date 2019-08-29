@@ -25,11 +25,11 @@ correctly, and you can't just change your output files.
 a. INPUT FILES: to load in your input files, you may need to change the format of the datestring that is in the file name. If
    it is necessary to change this in the actual code as opposed to just changing your files, you can edit the date_range function
    lines:  
-     
-   d2_str1 = str(d2)  
-   d2_str2 = d2.strftime('%Y_%m_%d')  
-   for f in all_files:  
-      if d2_str1 in str(f) or d2_str2 in str(f):  
+   
+      d2_str1 = str(d2)
+      d2_str2 = d2.strftime('%Y_%m_%d')
+      for f in all_files:
+         if d2_str1 in str(f) or d2_str2 in str(f):
   
    If you need to add a new date format, simply create d2_str3 = d2.strftime('your new format'), and append the line
    if d2_str1 in str(f) or d2_str2 in str(f): --> if d2_str1 in str(f) or d2_str2 in str(f) or d3_str3 in str(f):
@@ -39,7 +39,8 @@ b. OUTPUT FILES: Similarly to input files, if you're having problems loading you
         if str(mod_start_time.date()) in str(obs_files) or mod_start_time.strftime('%Y_%m_%d') in str(obs_files):
            for obs_f in obs_files:
                if str(mod_start_time.date()) in str(obs_f) or mod_start_time.strftime('%Y_%m_%d') in str(obs_f):
-     and again, you can just add another or statement in both if statements with"
+               
+   and again, you can just add another or statement in both if statements with"
           mod_start_time.strftime(your format) in str(obs_f)
           
 2. MODEL PREDICTION WINDOW: some models do not have predictions windows, but simply have one value at one time (for example, calculating
