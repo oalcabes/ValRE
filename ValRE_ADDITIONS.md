@@ -54,25 +54,23 @@ a. INPUT FILES: to load in your input files, you may need to change the format o
    and again, you can just add another or statement in both if statements with:
    ```python
    mod_start_time.strftime(your format) in str(obs_f)
-   ```
-          
+   ```          
 2. MODEL PREDICTION WINDOW: some models do not have predictions windows, but simply have one value at one time (for example, calculating
 a flux based off of a CME speed). If you have such a model and need to run it through ValRE, I suggest pre-processing your model start
 and end times according to the times the model would actually be predicting for. If more alterations are necessary, edits to ValRE would 
 likely occur in the following if statement in the main code:
-
-                    ```python
-                    if mod_end_time < obs_start_time:
-                        #model forecast ends before event starts
-                        print('model file too early - skipping')            
-                    elif obs_start_time < mod_start_time:
-                        #model forecast begins after event ends
-                        print('model file too late - skipping')                
-                    elif obs_start_time < mod_end_time:
-                        #model forecast starts before event begins and ends after
-                        #event starts, so using this file
-                        print('model file recorded event')
-                    ```
+```python
+if mod_end_time < obs_start_time:
+    #model forecast ends before event starts
+    print('model file too early - skipping')            
+elif obs_start_time < mod_start_time:
+    #model forecast begins after event ends
+    print('model file too late - skipping')                
+elif obs_start_time < mod_end_time:
+    #model forecast starts before event begins and ends after
+    #event starts, so using this file
+    print('model file recorded event')
+```
           
           
 Likely Problems with gen_output Module
