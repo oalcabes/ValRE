@@ -31,11 +31,11 @@ a. INPUT FILES: to load in your input files, you may need to change the format o
       d2_str2 = d2.strftime('%Y_%m_%d')
       for f in all_files:
          if d2_str1 in str(f) or d2_str2 in str(f):
-    ```
+    ```  
     
-   If you need to add a new date format, simply create d2_str3 = d2.strftime('your new format'), and append the line
-   if d2_str1 in str(f) or d2_str2 in str(f): --> if d2_str1 in str(f) or d2_str2 in str(f) or d3_str3 in str(f):
-b. OUTPUT FILES: Similarly to input files, if you're having problems loading your output files and need to change the form of the
+   If you need to add a new date format, simply create ```python d2_str3 = d2.strftime('your new format')```, and append the line
+   ```python if d2_str1 in str(f) or d2_str2 in str(f):``` to ```python if d2_str1 in str(f) or d2_str2 in str(f) or d3_str3 in str(f):```
+   b. OUTPUT FILES: Similarly to input files, if you're having problems loading your output files and need to change the form of the
    datestring, you can alter the following lines in the main function of the code:  
    
         if str(mod_start_time.date()) in str(obs_files) or mod_start_time.strftime('%Y_%m_%d') in str(obs_files):
