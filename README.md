@@ -42,8 +42,9 @@ The full list of modules that ValRE uses can be found at the beginning of the Va
 This program makes use of the software "operational_sep_quantities" and "operational_sep_quantities_one" created by Katie Whitman,
 a program which has extensive that can be found with the command "pydoc operational_sep_quantities".
 
-The module "gen_output" is also included with the ValRE package, which are scripts that can be used to 
-generate observational output from operational_sep_quantities.py, and each have their own documentation comments within the code.
+The module "gen_output" is also included with the ValRE package, which contains functions that use "operational_sep_quantities"
+and "operational_sep_quantities_one" to generate observational output in the correct JSON format. The module has its own documentation
+file called "gen_output_README.md", which can be found in this package.
 
 Assumptions/Simplifications
 ===========================
