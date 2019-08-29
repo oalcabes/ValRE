@@ -66,7 +66,9 @@ end_day = 24
 #put in one. If your model has the potential to predict an event 5 days before it
 #happens, put in 5. The smallest value is 1 day, so if your model only has the
 #potential to predict an event a few hours before it happens, leave this value
-#as 1.
+#as 1. ValRE will check each model file that has a date within this time window
+#and make sure it is actually forecasting for the given event and not for some other
+#earlier or later event, so if this window is very large, it should not be a problem.
 days_before_event = 1
 
 
