@@ -76,6 +76,18 @@ elif obs_start_time < mod_end_time:
     print('model file recorded event')
 ```
 3. READING IN MODEL THRESHOLDS  
+Currently, ValRE will only use thresholds given in configuration files for validation purposes. However, it may be necessary
+for ValRE to read in thresholds that are given in model output. If that becomes the case, it will be necessary to make changes
+to the
+```python
+extract_mod_values
+```
+function in the ValRE code, particularly creating the values
+```python
+mod_values["probability_threshold"]
+mod_values["flux_threshold"]
+```
+and reading the thresholds from the model files accordingly.
           
           
 Likely Problems with gen_output Module
