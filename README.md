@@ -7,7 +7,8 @@ which are written into reports (in PDF and/or JSON format). ValRE also creates p
 for qualitative verification, which appear in the PDF and are present as PNG files in the
 validation_reports/figures folder.
 
-***NOTE: ValRE was not intended for the creation of model output or observational output. You must already have output present in some directory on your computer in order to run ValRE.***
+***NOTE: ValRE was not intended for the creation of model output or observational output.***
+***You must already have output present in some directory on your computer in order to run ValRE.***
 
 ADDITIONALLY: IF YOU NEED TO ALTER THE CODE, PLEASE READ ValRE_ADDITIONS.TXT FIRST
 
@@ -81,9 +82,11 @@ In the configuration document, specify:
 3. the name of the model
 4. the date for the first day you are interested in validating, separated by year, month, and day
 5. the date for the last day you are interested in validating, separated by year, month, and day
-   **NOTE: you do not actually have to have model output for your beginning and end dates. ValRE will simply extract all model files that are dated within the date range that you have given. Again, the date MUST be in the name of the model file!!**
-6. the window of time before the actual event starts that ValRE should check for model output within (ie check for model output
-   1 day before event, 2 days, etc. and see if those have actually forecasted for this event)
+   **NOTE: you do not actually have to have model output for your beginning and end dates.**
+   **ValRE will simply extract all model files that are dated within the date range that you have given.**
+   **Again, the date MUST be in the name of the model file!!**
+6. the window of time before the actual event starts that ValRE should check for model output within
+   (ie check for model output 1 day before event, 2 days, etc. and see if those have actually forecasted for this event)
 7. thresholds for the energy, the flux, and/or the probability
 8. whether or not you'd like PDF and/or JSON reports
 9. manual inputs for hits, misses, correct negatives, and false alarms
