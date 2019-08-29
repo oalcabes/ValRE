@@ -21,18 +21,20 @@ what ValRE does:
 Likely Problems with ValRE
 ==========================
 1. NOT LOADING IN FILES CORRECTLY: There are a few things you may need to change in the code if it isn't loading in your files 
-correctly, and you can't just change your output files.
-   a. INPUT FILES: to load in your input files, you may need to change the format of the datestring that is in the file name. If
+correctly, and you can't just change your output files.  
+..a. INPUT FILES: to load in your input files, you may need to change the format of the datestring that is in the file name. If
    it is necessary to change this in the actual code as opposed to just changing your files, you can edit the date_range function
-   lines:
-        d2_str1 = str(d2)
-        d2_str2 = d2.strftime('%Y_%m_%d')
-        # print(d2)
-        for f in all_files:
-            if d2_str1 in str(f) or d2_str2 in str(f):
-    If you need to add a new date format, simply create d2_str3 = d2.strftime('your new format'), and append the line
-    if d2_str1 in str(f) or d2_str2 in str(f): --> if d2_str1 in str(f) or d2_str2 in str(f) or d3_str3 in str(f):
-    b. OUTPUT FILES: Similarly to input files, if you're having problems loading your output files and need to change the form of the
+   lines:  
+     
+...d2_str1 = str(d2)
+...d2_str2 = d2.strftime('%Y_%m_%d')
+...# print(d2)
+...for f in all_files:
+......if d2_str1 in str(f) or d2_str2 in str(f):  
+  
+...If you need to add a new date format, simply create d2_str3 = d2.strftime('your new format'), and append the line
+...if d2_str1 in str(f) or d2_str2 in str(f): --> if d2_str1 in str(f) or d2_str2 in str(f) or d3_str3 in str(f):
+..b. OUTPUT FILES: Similarly to input files, if you're having problems loading your output files and need to change the form of the
     datestring, you can alter the following lines in the main function of the code:    
         if str(mod_start_time.date()) in str(obs_files) or mod_start_time.strftime('%Y_%m_%d') in str(obs_files):
            for obs_f in obs_files:
