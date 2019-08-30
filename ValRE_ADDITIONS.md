@@ -24,9 +24,9 @@ Likely Problems with ValRE
 There are a few things you may need to change in the code if it isn't loading in your files 
 correctly, and you can't just change your output files.  
 a. INPUT FILES  
-   to load in your input files, you may need to change the format of the datestring that is in the file name. If
-   it is necessary to change this in the actual code as opposed to just changing your files, you can edit the date_range function
-   lines:  
+to load in your input files, you may need to change the format of the datestring that is in the file name. If
+it is necessary to change this in the actual code as opposed to just changing your files, you can edit the date_range function
+lines:  
    
    ```python
       d2_str1 = str(d2)
